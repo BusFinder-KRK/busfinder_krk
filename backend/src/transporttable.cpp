@@ -56,7 +56,7 @@ void transporttable::generate_table() {
 }
 
 void transporttable::printtable() {
-  for (auto [a, trips] : table_) {
+  for (const auto& [a, trips] : table_) {
     std::cout << a.first << " " << a.second << std::endl;
     std::cout << "trips: " << std::endl;
     for (const auto &[time_stop1, time_stop2, trip_id] : trips)
