@@ -16,9 +16,9 @@ set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(libpqxx)
 
 add_executable(backend
-    src/transporttable.cpp
         src/main.cpp
-        router.cpp)
+        src/transporttable.cpp
+        src/routing.cpp)
 
 target_include_directories(backend PRIVATE include)
 
