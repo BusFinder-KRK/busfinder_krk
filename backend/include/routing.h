@@ -4,7 +4,7 @@
 #include <transporttable.h>
 #include <vector>
 
-class routing {
+class Routing {
 public:
   const int search_window{30};
   const double time_for_change{0.5};
@@ -26,6 +26,18 @@ private:
   std::vector<trip> walking_between_stops_reversed_(
       std::string stop_id1, std::string stop_id2,
       std::chrono::time_point<std::chrono::system_clock> time);
+  //moje:
+  struct Node {
+    std::string stop_name; // for example "Kapelanka07"
+    std::string line_id; // or "walk"
+  };
+
+  struct NodeTimeInfo {
+    float time_from_start; //time from start of the journy (change to time type later?)
+    std::chrono::time_point<std::chrono::system_clock> real_time; // for example 15:49:23
+    //in python there was also the line id here again?
+  };
+  void dijkstra_dalekowzrocznosc(const std::string& start, const std::string& target, std::chrono::time_point<std::chrono::system_clock> time);
 };
 
 #endif // BUSFINDER_BACKEND_ROUTER_H
