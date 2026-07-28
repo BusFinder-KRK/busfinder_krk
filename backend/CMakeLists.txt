@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(libpqxx)
 add_executable(backend
         src/transporttable.cpp
         src/main.cpp
-        src/routing.cpp)
+        router.cpp)
 
 target_include_directories(backend PRIVATE include)
 
