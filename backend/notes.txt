@@ -1,0 +1,3 @@
+NOTES:
+-think if we should add line_id to NodeTimeInfo
+-need the walking.json for the walking functions

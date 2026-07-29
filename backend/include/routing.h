@@ -18,6 +18,8 @@ private:
     struct Node {
         std::string stop_name; // for example "Kapelanka07"
         std::string line_id; // or "walk"
+
+        friend bool operator < (const Node& n1, const Node& n2);
     };
 
     struct NodeTimeInfo {
@@ -32,10 +34,14 @@ private:
         std::chrono::time_point<std::chrono::system_clock> arrival;
     };
 
-    std::vector<NodeTransport> transport_between_stops_( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<NodeTransport> transport_between_stops( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<Routing::NodeTransport> transport_between_stops_reverse( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+
+    //for walktime i need the json file:
     std::vector<NodeTransport> walking_between_stops_( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
 
-    void dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
+
+    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
                                    std::chrono::time_point<std::chrono::system_clock> time);
 };
 

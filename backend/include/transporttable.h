@@ -33,7 +33,7 @@ struct PairHash {
   }
 };
 
-struct trip {
+struct Trip {
   std::string time_stop1;
   std::string time_stop2;
   std::string trip_id;
@@ -41,6 +41,10 @@ struct trip {
 
 class transporttable {
 public:
+  std::unordered_map<std::pair<std::string, std::string>, std::vector<Trip>,
+                   PairHash>
+    table_;
+
   transporttable(std::string q = default_query,
                  const std::chrono::time_point<std::chrono::system_clock> t =
                      std::chrono::system_clock::now())
@@ -50,9 +54,6 @@ public:
 private:
   std::optional<pqxx::connection> connection_;
   std::string query_;
-  std::unordered_map<std::pair<std::string, std::string>, std::vector<trip>,
-                     PairHash>
-      table_;
   std::chrono::time_point<std::chrono::system_clock> time_;
   /**
    * @brief Formats the time_ parameter to a string usable in the query.

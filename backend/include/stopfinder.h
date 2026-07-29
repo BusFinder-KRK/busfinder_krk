@@ -1,6 +1,5 @@
 #include <vector>
 #include <pair>
-struct
 
 class StopFinder {
 public:
