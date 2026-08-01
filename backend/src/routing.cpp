@@ -1,12 +1,31 @@
+#include <fstream>
 #include <routing.h>
 #include <stopfinder.h>
 #include <queue>
+#include <nlohmann/json.hpp>
 
+//for Node struct
 bool operator < (const Routing::Node& n1, const Routing::Node& n2) {
     if (n1.stop_name < n2.stop_name)return true;
     if(n1.stop_name == n2.stop_name && n1.line_id < n2.line_id) return true;
     return false;
 }
+
+//for the routing:
+
+Routing::Routing() {
+    load_walking_json();
+}
+
+void Routing::load_walking_json() {
+    std::fstream file(json_path);
+    if (file.is_open()) {
+        json j;
+        file >> j;
+        walking_times_ = j.getstd::unordered_map<std::string, int>>();
+    }
+}
+
 
 std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
                                         std::chrono::time_point<std::chrono::system_clock> time) {
