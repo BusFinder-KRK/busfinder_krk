@@ -5,7 +5,7 @@
 
 using string = std::string;
 
-std::pair<string, string> transporttable::format_time() {
+std::pair<string, string> transporttable::format_time() const {
   const auto start_zoned =
       std::chrono::zoned_time{std::chrono::current_zone(), time_};
   const auto end_zoned = std::chrono::zoned_time{std::chrono::current_zone(),
@@ -39,16 +39,16 @@ std::pair<string, string> transporttable::format_time() {
 void transporttable::generate_table() {
   Config::load();
   auto [start_time, end_time] = format_time();
-  std::cout << start_time << " " << end_time << std::endl;
   string weekday = "c." + std::format("{:%A}", time_);
+  string current_date = std::format("{:%Y-%m-%d}", time_);
   std::ranges::transform(weekday, weekday.begin(),
                          [](char c) { return std::tolower(c); });
   string filled_query = std::vformat(query_, std::make_format_args(weekday));
   connection_.emplace(Config::connection_string);
   pqxx::work transaction{*connection_};
-  for (auto [stopid1, stopid2, arrival_time1, arrival_time2, tripid] :
+  for (const auto& [stopid1, stopid2, arrival_time1, arrival_time2, tripid] :
        transaction.query<string, string, string, string, string>(
-           filled_query, {start_time, end_time})) {
+           filled_query, {start_time, end_time, current_date})) {
     table_[{stopid1, stopid2}].push_back(
         {arrival_time1, arrival_time2, tripid});
   }
@@ -56,6 +56,7 @@ void transporttable::generate_table() {
 }
 
 void transporttable::printtable() {
+  std::cout << table_.size() << std::endl;
   for (const auto& [a, trips] : table_) {
     std::cout << a.first << " " << a.second << std::endl;
     std::cout << "trips: " << std::endl;

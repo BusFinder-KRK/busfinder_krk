@@ -14,12 +14,19 @@ inline std::string default_query = R"(
                 JOIN stop_times s2 ON s1.trip_id = s2.trip_id
                 JOIN trips t ON s1.trip_id = t.trip_id
                 JOIN routes r ON t.route_id = r.route_id
-                JOIN calendar c ON t.service_id = c.service_id
+                LEFT JOIN calendar c ON t.service_id = c.service_id
+                LEFT JOIN calendar_dates cd ON t.service_id = cd.service_id AND cd.date = $3
                 WHERE s1.stop_sequence < s2.stop_sequence
+                AND (
+                  cd.exception_type = 1
+                  OR
+                  (
+                  $3::DATE BETWEEN c.start_date AND c.end_date AND (cd.exception_type IS NULL OR cd.exception_type != 2)
+                  )
+                )
                 AND s1.trip_id = s2.trip_id
                 AND s1.arrival_time > $1
                 AND s1.arrival_time < $2
-                AND {} = 1
                 ORDER BY s1.arrival_time ASC;
                 )";
 
@@ -46,7 +53,6 @@ public:
                      std::chrono::system_clock::now())
       : query_{std::move(q)}, time_{t} {};
   void generate_table();
-
 private:
   std::optional<pqxx::connection> connection_;
   std::string query_;
@@ -59,10 +65,11 @@ private:
    *
    * @return A (time, time limit) pair formatted for the query.
    */
-  std::pair<std::string, std::string> format_time();
+  std::pair<std::string, std::string> format_time() const;
 public:
   //helper members;
   void printtable();
+  size_t size() const { return table_.size(); }
 };
 
 #endif // SRC_TRANSPORTTABLE_H

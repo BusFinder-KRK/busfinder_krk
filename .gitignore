@@ -5,6 +5,5 @@
 **/.env
 **/.env.*
 !/backend/.env.example
-
 #database dump
 **/*.sql
