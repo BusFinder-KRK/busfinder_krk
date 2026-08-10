@@ -16,6 +16,7 @@ FetchContent_Declare(
         URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
 
+set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libpqxx json)
@@ -28,7 +29,7 @@ add_executable(backend
 
 target_include_directories(backend PRIVATE include)
 
-target_link_libraries(backend PRIVATE pqxx)
+target_link_libraries(backend PRIVATE pqxx nlohmann_json::nlohmann_json)
 
 set_target_properties(backend PROPERTIES
         CXX_STANDARD 20

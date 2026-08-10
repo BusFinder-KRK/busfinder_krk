@@ -3,6 +3,11 @@
 #include <stopfinder.h>
 #include <queue>
 #include <nlohmann/json.hpp>
+using json = nlohmann::json;
+//==================================================
+//TO DO FOR OVERREAL PERFOMANCE
+//maybe later switch the line ID to be and integer since ints are faster: for exaple instead of doing "walk" do a -1 or sth
+//==================================================
 
 //for Node struct
 bool operator < (const Routing::Node& n1, const Routing::Node& n2) {
@@ -18,11 +23,12 @@ Routing::Routing() {
 }
 
 void Routing::load_walking_json() {
-    std::fstream file(json_path);
+    //i didnt make any checking for debuging but i might add it later
+    std::ifstream file(json_path);
     if (file.is_open()) {
         json j;
         file >> j;
-        walking_times_ = j.getstd::unordered_map<std::string, int>>();
+        walking_times_ = j.get<std::unordered_map<std::string, int>>();
     }
 }
 
@@ -83,7 +89,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
             if (new_stop != old_node.stop_name) {
                 std::vector<NodeTransport>result = transport_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                 if (result.empty()) {
-                    result = walking_between_stops_(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
+                    result = walking_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                     if (result.empty()) {
                         //safty net - zeby graf sie nie rozspujnil
                         int dist_meters = distance * 1609.344;
@@ -137,7 +143,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     return ans;
 }
 
-std::vector<Routing::NodeTransport> Routing::transport_between_stops( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
+std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
     std::vector<Routing::NodeTransport> result;
     std::string houradmin = std::format("{:%T}", time);
     auto midnight = std::chrono::floor<std::chrono::days>(time);
@@ -166,7 +172,7 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops( std::strin
     return result;
 }
 
-std::vector<Routing::NodeTransport> Routing::transport_between_stops_reverse( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
+std::vector<Routing::NodeTransport> Routing::transport_between_stops_reverse(const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
     std::vector<Routing::NodeTransport> result;
     std::string houradmin = std::format("{:%T}", time);
     auto midnight = std::chrono::floor<std::chrono::days>(time);
@@ -193,4 +199,54 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops_reverse( st
         }
     }
     return result;
+}
+
+//==================================================
+//TO DO WITH WALKING (when i will want to maximize for spped:
+//do not allocate with vector but just return std::optional<NodeTransport> !
+//do not concate the string - just either change the json or just change the approach when loading into RAM? not
+//sure about this tho?
+//use std pair string string as key in map
+//maybe refactor this code into one bit so i dont have to repeat myslef?
+//==================================================
+std::vector<Routing::NodeTransport> Routing::walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
+    std::vector<Routing::NodeTransport> vec;
+    std::string str1 = stop_id1 + "," + stop_id2;
+
+    if (auto it = walking_times_.find(str1); it != walking_times_.end()) {
+        std::chrono::time_point<std::chrono::system_clock> t2 = time + std::chrono::minutes(it->second);
+        NodeTransport nt{"walk", time, t2};
+        vec.push_back(nt);
+        return vec;
+    }
+
+    std::string str2 = stop_id2 + "," + stop_id1;
+    else if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
+        std::chrono::time_point<std::chrono::system_clock> t2 = time + std::chrono::minutes(it->second);
+        NodeTransport nt{"walk", time, t2};
+        vec.push_back(nt);
+        return vec;
+    }
+    else return vec;
+}
+
+std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
+    std::vector<Routing::NodeTransport> vec;
+    std::string str1 = stop_id1 + "," + stop_id2;
+
+    if (auto it = walking_times_.find(str1); it != walking_times_.end()) {
+        std::chrono::time_point<std::chrono::system_clock> t1 = time - std::chrono::minutes(it->second);
+        NodeTransport nt{"walk", t1, time};
+        vec.push_back(nt);
+        return vec;
+    }
+
+    std::string str2 = stop_id2 + "," + stop_id1;
+    if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
+        std::chrono::time_point<std::chrono::system_clock> t1 = time - std::chrono::minutes(it->second);
+        NodeTransport nt{"walk", t1, time};
+        vec.push_back(nt);
+        return vec;
+    }
+    return vec;
 }

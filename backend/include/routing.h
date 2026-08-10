@@ -13,13 +13,9 @@ public:
     const int walking_multiplier{1};
     const int walking_pace{60};
     const int adjacent_stops{20};
-    Routing();konstruktor ktory bedzie zmieniac parametry wyzej?
-    //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
 
-private:
-    std::filesystem::path json_path = "assets/walking.json";
-    std::unordered_map<std::string, int> walking_times_;
-    transporttable ttable_;
+    Routing();//konstruktor ktory bedzie zmieniac parametry wyzej?
+    //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
 
     struct Node {
         std::string stop_name; // for example "Kapelanka07"
@@ -39,15 +35,17 @@ private:
         std::chrono::time_point<std::chrono::system_clock> departure;
         std::chrono::time_point<std::chrono::system_clock> arrival;
     };
+private:
+    std::filesystem::path json_path = "assets/walking.json";
+    std::unordered_map<std::string, int> walking_times_;
+    transporttable ttable_;
 
     void load_walking_json();
 
-    std::vector<NodeTransport> transport_between_stops( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-    std::vector<Routing::NodeTransport> transport_between_stops_reverse( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-
-    //for walktime i need the json file:
-    std::vector<NodeTransport> walking_between_stops_( std::string stop_id1, std::string stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-
+    std::vector<NodeTransport> transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<NodeTransport> transport_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
 
     std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
                                    std::chrono::time_point<std::chrono::system_clock> time);
