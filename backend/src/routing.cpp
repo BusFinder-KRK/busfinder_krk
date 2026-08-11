@@ -73,6 +73,10 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     > pq;
     pq.push(std::make_pair(0, start_node));
     Node ending_node;
+    StopFinder sf{adjacent_stops};
+    //TO DO: =================
+    //- check if i can call something after something else exists to save time
+    //========================
 
     while (!pq.empty()) {
         auto [old_cost, old_node] = pq.top();
@@ -83,7 +87,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
             break;
         }
         if (old_cost > record_of_distances[old_node].time_from_start) continue;
-        StopFinder sf{adjacent_stops};
+        //StopFinder sf{adjacent_stops}; we moved it upward to be faster
         int time_to_arrive;
         for (const auto &[new_stop, distance]: sf.find_stop_ids(old_node.stop_name)) {
             if (new_stop != old_node.stop_name) {
@@ -221,13 +225,13 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops( const std::s
     }
 
     std::string str2 = stop_id2 + "," + stop_id1;
-    else if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
+    if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
         std::chrono::time_point<std::chrono::system_clock> t2 = time + std::chrono::minutes(it->second);
         NodeTransport nt{"walk", time, t2};
         vec.push_back(nt);
         return vec;
     }
-    else return vec;
+    return vec;
 }
 
 std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {

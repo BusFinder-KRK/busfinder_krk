@@ -1,3 +1,27 @@
 NOTES:
+
+GENERAL============
 -think if we should add line_id to NodeTimeInfo
--need the walking.json for the walking functions
+=====================
+
+STOPFINDER.CPP===============
+- !! the convertion - I'm currently keeping it in degrees, but i want to change it to meteres - questions:
+        - when so it's the fastest?
+        -are we sure wee need it? (proabbly for theasfty so yeah)
+=====================
+
+ROUTING.CPP===============
+- maybe later switch the line ID to be and integer since ints are faster: for exaple instead of doing "walk" do a -1 or sth
+- MAYBE add checking for debuging in load_walking_json
+- jakie dane ma zwraca dijkstra
+- TO DO WITH WALKING (when i will want to maximize for spped:
+        -do not allocate with vector but just return std::optional<NodeTransport> !
+        -do not concate the string - just either change the json or just change the approach when loading into RAM? not
+        -sure about this tho?
+        -use std pair string string as key in map
+        -maybe refactor this code into one bit so i dont have to repeat myslef?
+=====================
+
+ROUTING.H===============
+- add a constructor that changes the paramters
+=====================
