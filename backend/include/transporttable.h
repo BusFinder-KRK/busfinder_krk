@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef SRC_TRANSPORTTABLE_H
 #define SRC_TRANSPORTTABLE_H
 

@@ -16,7 +16,7 @@ StopFinder::StopFinder(const int& num) : number_of_stops(num+1), wrapper_tree_(2
 
 void StopFinder::generate_map() {
     Config::load();
-    const std::string filled_query = std::vformat(default_query, std::make_format_args(number_of_stops));
+    const std::string filled_query = std::vformat(def_query, std::make_format_args(number_of_stops));
     connection_.emplace(Config::connection_string);
     pqxx::work transaction{*connection_};
     for (const auto& [stopid, lan, lon] : transaction.query<std::string, float, float>(filled_query)) {
@@ -27,6 +27,10 @@ void StopFinder::generate_map() {
     transaction.commit();
 }
 
+
+//TO DO:===============
+//- maybe you can do the vector even faster keep the number_foStops_vector inilisaized in the constructor and then you will just clena it? will that be faster or sis cleaning slow (im guessing its faster but later check it)
+//=====================
 std::vector<std::pair<std::string, float>> StopFinder::find_stop_ids(std::string stopid) {
     auto it = coordinates_.find(stopid);
     if (it == coordinates_.end())return {};

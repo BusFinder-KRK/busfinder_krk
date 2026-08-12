@@ -7,7 +7,7 @@ GENERAL============
 STOPFINDER.CPP===============
 - !! the convertion - I'm currently keeping it in degrees, but i want to change it to meteres - questions:
         - when so it's the fastest?
-        -are we sure wee need it? (proabbly for theasfty so yeah)
+        -are we sure wee need it? (proabbly for the safety net so yeah)
 =====================
 
 ROUTING.CPP===============
@@ -20,6 +20,10 @@ ROUTING.CPP===============
         -sure about this tho?
         -use std pair string string as key in map
         -maybe refactor this code into one bit so i dont have to repeat myslef?
+- !!! TO DO WITH output method:
+         - what with arrival time??
+         - how to format this thing?
+
 =====================
 
 ROUTING.H===============

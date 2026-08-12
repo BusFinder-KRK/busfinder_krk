@@ -1,13 +1,14 @@
+#pragma once
+
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <pqxx/pqxx>
 #include <nanoflann.hpp>
 
-inline std::string default_query = R"(
+inline std::string def_query = R"(
                 SELECT stop_id, stop_lat, stop_lon FROM stops
-                ORDER BY distance
-                LIMIT {} //but instead of s the number of stops tho
+                LIMIT {}
                 )";
 
 
@@ -47,6 +48,7 @@ public:
     nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<float, KdtreeStruct>, KdtreeStruct, 2, size_t> wrapper_tree_;
 
     StopFinder(const int& num);
+    void put_data(const int& num);
     void generate_map();
 
     //metohod to get you the closest n number of stops based on a stop name
