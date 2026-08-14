@@ -29,19 +29,10 @@ StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) 
   const double alpha1 = 0.5*n - 2.0/3 * pow(n,2) + 5.0/16 * pow(n,3);
   const double alpha2 = 13.0/48 * pow(n,2) - 3.0/5 * pow(n,3);
   const double alpha3 = 61.0/240 * pow(n,3);
-  const double beta1 = 0.5*n - 2.0/3 * pow(n,2) + 37.0/96 * pow(n,3);
-  const double beta2 = 1.0/48 * pow(n,2) - 1.0/15 * pow(n,3);
-  const double beta3 = 17.0/480 * pow(n,3);
-  const double gamma1 = 2.0*n - 2.0/3 * pow(n,2) - 2 * pow(n,3);
-  const double gamma2 =  7.0/3 * pow(n,2) - 8.0/5 * pow(n,3);
-  const double gamma3 = 56.0/15 * pow(n,3);
 
   const double t = sinh(atanh(sin(p1)) - 2*sqrt(n)/(1 + n) * atanh(2*sqrt(n)/(1 + n) * sin(p1)));
   const double xiprime = atan(t/cos(p2 - ref_meridian));
   const double etaprime = atanh(sin(p2 - ref_meridian)/sqrt(1 + t*t));
-
-  const double sigma = 1 + 2*alpha1*cos(2*xiprime)*cosh(2*etaprime) + 4*alpha2*cos(4*xiprime)*cosh(4*etaprime) + 6*alpha3*cos(6*xiprime)*cosh(6*etaprime);
-  const double tau = 2*alpha1*sin(2*xiprime)*sinh(2*etaprime) + 4*alpha2*sin(4*xiprime)*sinh(4*etaprime) + 6*alpha1*sin(6*xiprime)*sinh(6*etaprime);
 
   x = E0 + k0*A*(etaprime + alpha1*cos(2*xiprime)*sinh(2*etaprime) + alpha2*cos(4*xiprime)*sinh(4*etaprime) +  alpha3*cos(6*xiprime)*sinh(6*etaprime));
   y = N0 + k0*A*(xiprime + alpha1*sin(2*xiprime)*cosh(2*etaprime) + alpha2*sin(4*xiprime)*cosh(4*etaprime) + alpha3*sin(6*xiprime)*cosh(6*etaprime));
