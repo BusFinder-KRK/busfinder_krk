@@ -15,9 +15,9 @@ inline std::string def_query = R"(
 
 struct StopData {
     std::string stop_id;
-    float x;
-    float y;
-    StopData(std::string s, float p1, float p2) : stop_id(s), x(p1), y(p2) {};
+    double x;
+    double y;
+    StopData(std::string s, double p1, double p2);
 };
 
 class StopFinder {
@@ -25,10 +25,10 @@ public:
     struct KdtreeStruct
     {
         std::vector<StopData> tree_vec_;
-        size_t kdtree_get_point_count() const {
+        [[nodiscard]] size_t kdtree_get_point_count() const {
             return tree_vec_.size();
         }
-        float kdtree_get_pt(const size_t idx, int dim) const {
+        [[nodiscard]] float kdtree_get_pt(const size_t idx, int dim) const {
             if (dim == 0)return tree_vec_[idx].x;
             return tree_vec_[idx].y;
         }
@@ -48,12 +48,11 @@ public:
     nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<float, KdtreeStruct>, KdtreeStruct, 2, size_t> wrapper_tree_;
 
     StopFinder(const int& num);
-    void put_data(const int& num);
     void generate_map();
 
     //metohod to get you the closest n number of stops based on a stop name
     //returns paif - stop ID and distance between the stops
-    std::vector<std::pair<std::string, float>> find_stop_ids(std::string stopid);
+    std::vector<std::pair<std::string, float>> find_stop_ids(const std::string& stopid);
 
 //private: do - it later
 
