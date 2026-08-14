@@ -1,4 +1,7 @@
 #include "../include/stopfinder.h"
+
+#include <iostream>
+
 #include "config.h"
 
 // NOTE:=================

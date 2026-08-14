@@ -8,7 +8,6 @@
 
 inline std::string def_query = R"(
                 SELECT stop_id, stop_lat, stop_lon FROM stops
-                LIMIT {}
                 )";
 
 
