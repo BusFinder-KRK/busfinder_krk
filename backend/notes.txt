@@ -23,7 +23,6 @@ ROUTING.CPP===============
 - !!! TO DO WITH output method:
          - what with arrival time??
          - how to format this thing?
-
 =====================
 
 ROUTING.H===============

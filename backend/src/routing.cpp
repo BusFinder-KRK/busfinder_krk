@@ -169,7 +169,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
      *  [NODE, NODE]
      */
     Node start_node{start, "walk"};
-    NodeTimeInfo start_node_time{0, time};
+    NodeTimeInfo start_node_time{0, time}; //why i snot used?
     std::map<Node, NodeTimeInfo> record_of_distances;
     std::map<Node, Node> prev;
     std::priority_queue<
@@ -346,7 +346,6 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
 }
 
 //TO DO: ===================
-//- what with arrival time??
 //- how to format this thing?
 //==========================
 std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::output(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time) {
