@@ -22,7 +22,7 @@ Routing::Routing() : sf_(adjacent_stops) {
 }
 
 void Routing::load_walking_json() {
-    //i didnt make any checking for debuging but i might add it later
+    //i didn't make any checking for debuging but i might add it later
     std::ifstream file(json_path_);
     if (file.is_open()) {
         json j;
@@ -33,7 +33,7 @@ void Routing::load_walking_json() {
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
     std::vector<Routing::NodeTransport> result;
-    std::string houradmin = std::format("{:%T}", time);
+    std::string houradmin = std::format("{:%H:%M}", time);
     auto midnight = std::chrono::floor<std::chrono::days>(time);
 
     auto it = ttable_.table_.find({stop_id1, stop_id2});
@@ -169,33 +169,36 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
      *  [NODE, NODE]
      */
     Node start_node{start, "walk"};
-    NodeTimeInfo start_node_time{0, time}; //why i snot used?
+    NodeTimeInfo start_node_time{0, time};
     std::map<Node, NodeTimeInfo> record_of_distances;
     std::map<Node, Node> prev;
+    record_of_distances[start_node] = start_node_time;
     std::priority_queue<
         std::pair<int, Node>,
         std::vector<std::pair<int, Node> >,
         std::greater<std::pair<int, Node> >
     > pq;
-    pq.push(std::make_pair(0, start_node));
+    pq.emplace(0, start_node);
     Node ending_node;
 
     //TO DO: =================
     //- check if i can call something after something else exists to save time
     //========================
-
+    std::cout << "before the pq" << '\n';
     while (!pq.empty()) {
         auto [old_cost, old_node] = pq.top();
         pq.pop();
+        std::cout << "old cost: " << old_cost << " stop name: " << old_node.stop_name << " line :" << old_node.line_id << '\n';
 
         if (old_node.stop_name == target) {
             ending_node = old_node;
             break;
         }
         if (old_cost > record_of_distances[old_node].time_from_start) continue;
-        //StopFinder sf{adjacent_stops}; we moved it upward to be faster
+        //here is the porblem!!!
         int time_to_arrive;
         for (const auto &[new_stop, distance]: sf_.find_stop_ids(old_node.stop_name)) {
+            std::cout << "in the for?" << '\n';
             if (new_stop != old_node.stop_name) {
                 std::vector<NodeTransport>result = transport_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                 if (result.empty()) {
@@ -224,14 +227,14 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                     if (!record_of_distances.contains(n)) {
                         NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                         record_of_distances[n] = nt;
-                        pq.push(std::make_pair(old_cost + time_to_arrive, n));
+                        pq.emplace(old_cost + time_to_arrive, n);
                         prev[n] = old_node;
                     }
                     else {
                         if (record_of_distances[n].time_from_start > old_cost + time_to_arrive) {
                             NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                             record_of_distances[n] = nt;
-                            pq.push(std::make_pair(old_cost + time_to_arrive, n));
+                            pq.emplace(old_cost + time_to_arrive, n);
                             prev[n] = old_node;
                         }
                     }
@@ -240,16 +243,29 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
             }
         }
     }
+    std::cout << "after pq" << '\n';
+
+    if (ending_node.stop_name.empty()) {
+        std::cout << "I fucked up" << '\n';
+        return {};
+
+    }
+
     //teraz otwarzamy droge od tyłu:
     std::vector<Node> help;
     help.push_back(ending_node);
-    while (help[help.size()-1].stop_name != start) help.push_back(prev[help[help.size()-1]]);\
-
+    //while (help[help.size()-1].stop_name != start) help.push_back(prev[help[help.size()-1]]);
+    while (!help.empty() && help.back().stop_name != start) {
+        if (!prev.contains(help.back()))break;
+        help.push_back((prev[help.back()]));
+    }
+    //LATER GET RID OF THIS:
+    std::reverse(help.begin(), help.end());
     std::vector<std::pair<Node, NodeTimeInfo>> ans;
     for (const auto& node : help) {
-        std::cout << node.line_id << " " << node.stop_name << " " << record_of_distances[node].real_time << " " << record_of_distances[node].time_from_start << '\n';
+        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].time_from_start << '\n';
         //TO JEST DO ZMIANY W ZALEZNOSCI OD TEGO JAKIE INFO CHCEMY! i chyba pasuje jednak to dego NodeTimeInfo dodac nazwe liniji bo innaczje bedzie pokazywac wczesniejsza i belive
-        ans.push_back(std::make_pair(node, record_of_distances[node]));
+        ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;
 }
@@ -261,12 +277,13 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     NodeTimeInfo start_node_time{0, time};
     std::map<Node, NodeTimeInfo> record_of_distances;
     std::map<Node, Node> prev;
+    record_of_distances[start_node] = start_node_time;
     std::priority_queue<
         std::pair<int, Node>,
         std::vector<std::pair<int, Node> >,
         std::greater<std::pair<int, Node> >
     > pq;
-    pq.push(std::make_pair(0, start_node));
+    pq.emplace(0, start_node);
     Node ending_node;
 
     //TO DO: =================
@@ -316,14 +333,14 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                     if (!record_of_distances.contains(n)) {
                         NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                         record_of_distances[n] = nt;
-                        pq.push(std::make_pair(old_cost + time_to_arrive, n));
+                        pq.emplace(old_cost + time_to_arrive, n);
                         prev[n] = old_node;
                     }
                     else {
                         if (record_of_distances[n].time_from_start > old_cost + time_to_arrive) {
                             NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                             record_of_distances[n] = nt;
-                            pq.push(std::make_pair(old_cost + time_to_arrive, n));
+                            pq.emplace(old_cost + time_to_arrive, n);
                             prev[n] = old_node;
                         }
                     }
@@ -332,15 +349,24 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
             }
         }
     }
+    if (ending_node.stop_name.empty()) {
+        return {};
+    }
+
     //teraz otwarzamy droge od tyłu:
     std::vector<Node> help;
     help.push_back(ending_node);
-    while (help[help.size()-1].stop_name != start) help.push_back(prev[help[help.size()-1]]);\
-
+    //while (help[help.size()-1].stop_name != start) help.push_back(prev[help[help.size()-1]]);
+    while (!help.empty() && help.back().stop_name != start) {
+        if (!prev.contains(help.back()))break;
+        help.push_back((prev[help.back()]));
+    }
+    std::reverse(help.begin(), help.end());
     std::vector<std::pair<Node, NodeTimeInfo>> ans;
     for (const auto& node : help) {
+        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].time_from_start << '\n';
         //TO JEST DO ZMIANY W ZALEZNOSCI OD TEGO JAKIE INFO CHCEMY! i chyba pasuje jednak to dego NodeTimeInfo dodac nazwe liniji bo innaczje bedzie pokazywac wczesniejsza i belive
-        ans.push_back(std::make_pair(node, record_of_distances[node]));
+        ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;
 }
@@ -350,10 +376,11 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
 //==========================
 std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::output(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time) {
     std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> arrival = dijkstra_dalekowzrocznosc(start, target, time);
-    //now how to we get an arrival time from dijsktra's arrival vector?
+    return arrival;
+    /*//now how to we get an arrival time from dijsktra's arrival vector?
     std::chrono::time_point<std::chrono::system_clock> arr_time = arrival[0].second.real_time; //= arrival[cos tam cos tam]?
     std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> answer = dijkstra_dalekowzrocznosc(target, start, arr_time);
     //now we should probably format something?
-    return answer;
+    return answer;*/
 }
 
