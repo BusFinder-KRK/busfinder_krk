@@ -11,19 +11,31 @@ FetchContent_Declare(
         GIT_TAG 8.0.1
 )
 
+FetchContent_Declare(
+        json
+        URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+)
+
+FetchContent_Declare(
+        nanoflann
+        GIT_REPOSITORY https://github.com/jlblancoc/nanoflann.git
+        GIT_TAG        v1.6.0
+)
+
+set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(libpqxx)
+FetchContent_MakeAvailable(libpqxx json nanoflann)
 
 add_executable(backend
         src/transporttable.cpp
         src/main.cpp
-#        src/routing.cpp
-)
+        src/routing.cpp
+        src/stopfinder.cpp)
 
 target_include_directories(backend PRIVATE include)
 
-target_link_libraries(backend PRIVATE pqxx)
+target_link_libraries(backend PRIVATE pqxx nlohmann_json::nlohmann_json nanoflann::nanoflann)
 
 set_target_properties(backend PROPERTIES
         CXX_STANDARD 20
@@ -37,3 +49,5 @@ configure_file(
         ${CMAKE_CURRENT_BINARY_DIR}/.env
         COPYONLY
 )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

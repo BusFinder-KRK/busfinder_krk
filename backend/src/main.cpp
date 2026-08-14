@@ -1,15 +1,12 @@
 #include <config.h>
-#include <transporttable.h>
-#include <iostream>
-#include <pqxx/pqxx>
+#include <routing.h>
 
-using namespace std;
 
 int main() {
-  transporttable t;
-  t.generate_table();
-  // t.printtable();
-  pqxx::connection conn(Config::connection_string);
-  pqxx::work transaction(conn);
-  cout << t.size();
+    std::string kapelanka3 = "stop_412_57603";
+    std::string n_kleparz4 = "stop_50_7104";
+    std::chrono::time_point<std::chrono::system_clock> t =
+                     std::chrono::system_clock::now();
+    Routing rout;
+    rout.output(kapelanka3, n_kleparz4, t);
 }
