@@ -230,7 +230,7 @@ with conn.cursor() as cur:
                 service_id, date, exception_type
             )
             SELECT
-                service_id, date, exception_type
+                service_id, date::date, exception_type
             FROM staging_calendar_dates_bus;
         """)
 
@@ -239,7 +239,7 @@ with conn.cursor() as cur:
                 service_id, date, exception_type
             )
             SELECT
-                service_id, date, exception_type
+                service_id, date::date, exception_type
             FROM staging_calendar_dates_tram;
         """)
 
