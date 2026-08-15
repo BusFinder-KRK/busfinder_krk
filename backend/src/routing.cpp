@@ -17,7 +17,10 @@ bool operator < (const Routing::Node& n1, const Routing::Node& n2) {
 
 //for the routing:
 
-Routing::Routing() : sf_(adjacent_stops) {
+Routing::Routing(std::chrono::time_point<std::chrono::system_clock> time) : sf_(adjacent_stops), ttable_(default_query, time) {
+    std::cout << "inside the constructor" << '\n';
+    ttable_.generate_table();
+    std::cout << "after generate" << '\n';
     load_walking_json();
 }
 
@@ -32,16 +35,19 @@ void Routing::load_walking_json() {
 }
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
+    std::cout << "we are in transport, size: " << ttable_.table_.size() << '\n';
+
     std::vector<Routing::NodeTransport> result;
     std::string houradmin = std::format("{:%H:%M}", time);
     auto midnight = std::chrono::floor<std::chrono::days>(time);
 
     auto it = ttable_.table_.find({stop_id1, stop_id2});
     if (it == ttable_.table_.end()) {
+        std::cout << "no stop_id1 to stop_id2 in the ttable" << '\n';
         return result;
     }
     const auto& possible_trips = it->second;
-
+    std::cout << "trip found" << '\n';
     for (const auto& option : possible_trips) {
         if (option.time_stop1 >= houradmin) {
             int h = std::stoi(option.time_stop1.substr(0,2));
@@ -53,6 +59,8 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std:
             auto t1 = midnight + std::chrono::minutes(minutes_1);
             auto t2 = midnight + std::chrono::minutes(minutes_2);
             NodeTransport nt {option.trip_id, t1, t2};
+            std::cout << "node: " << nt.line_id << " " << std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.departure)) << " "
+          << std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.arrival)) << '\n';
             result.push_back(nt);
             if (t1 > time + std::chrono::minutes(search_window))break;
         }
@@ -189,7 +197,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
         auto [old_cost, old_node] = pq.top();
         pq.pop();
         std::cout << "old cost: " << old_cost << " stop name: " << old_node.stop_name << " line :" << old_node.line_id << '\n';
-
+        std::cout << old_node.stop_name << " " << target << '\n';
         if (old_node.stop_name == target) {
             ending_node = old_node;
             break;
@@ -197,8 +205,9 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
         if (old_cost > record_of_distances[old_node].time_from_start) continue;
         //here is the porblem!!!
         int time_to_arrive;
+        std::cout << "hello???" << '\n';
         for (const auto &[new_stop, distance]: sf_.find_stop_ids(old_node.stop_name)) {
-            std::cout << "in the for?" << '\n';
+            std::cout << "we found the stop ids?" << '\n';
             if (new_stop != old_node.stop_name) {
                 std::vector<NodeTransport>result = transport_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                 if (result.empty()) {
@@ -227,6 +236,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                     if (!record_of_distances.contains(n)) {
                         NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                         record_of_distances[n] = nt;
+                        //std::cout << old_cost + time_to_arrive << " "<<n.line_id << " " << n.stop_name << '\n';
                         pq.emplace(old_cost + time_to_arrive, n);
                         prev[n] = old_node;
                     }

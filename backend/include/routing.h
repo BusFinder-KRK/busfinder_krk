@@ -3,11 +3,10 @@
 #ifndef BUSFINDER_BACKEND_ROUTING_H
 #define BUSFINDER_BACKEND_ROUTING_H
 
-#include <transporttable.h>
 #include <vector>
 #include  <filesystem>
 #include  <unordered_map>
-
+#include "transporttable.h"
 #include "stopfinder.h"
 
 class Routing {
@@ -37,7 +36,7 @@ public:
         std::chrono::time_point<std::chrono::system_clock> arrival;
     };
 
-    Routing();//konstruktor ktory bedzie zmieniac parametry wyzej?
+    Routing(std::chrono::time_point<std::chrono::system_clock> time);//konstruktor ktory bedzie zmieniac parametry wyzej?
     //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
     std::vector<std::pair<Node, NodeTimeInfo>> output(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time);
 
