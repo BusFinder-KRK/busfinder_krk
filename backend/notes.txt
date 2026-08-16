@@ -2,6 +2,7 @@ NOTES:
 
 GENERAL============
 -think if we should add line_id to NodeTimeInfo
+-should the path to csv be hardcoded?
 =====================
 
 STOPFINDER.CPP===============

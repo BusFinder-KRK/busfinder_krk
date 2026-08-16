@@ -42,12 +42,13 @@ public:
 
 
 private:
-    std::filesystem::path json_path_ = "assets/walking.json";
+    //this is hardcoded - should i make it not hardcoded?
+    std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
     std::unordered_map<std::string, int> walking_times_;
-    transporttable ttable_;
+    TransportTable ttable_;
     StopFinder sf_;
 
-    void load_walking_json();
+    void load_walking_csv();
 
     std::vector<NodeTransport> transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
     std::vector<NodeTransport> transport_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);

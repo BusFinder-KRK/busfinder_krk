@@ -5,7 +5,7 @@
 
 using string = std::string;
 
-std::pair<string, string> transporttable::format_time() const {
+std::pair<string, string> TransportTable::format_time() const {
   const auto start_zoned =
       std::chrono::zoned_time{std::chrono::current_zone(), time_};
   const auto end_zoned = std::chrono::zoned_time{std::chrono::current_zone(),
@@ -29,16 +29,43 @@ std::pair<string, string> transporttable::format_time() const {
       std::chrono::floor<std::chrono::days>(end_zoned.get_local_time());
   const std::chrono::hh_mm_ss end_split_time{end_time_duration};
   if (end_time_str >= "00:00:00" && end_time_str < "04:00:00")
+    //this line crashes:
     end_time_result = std::to_string(24 + end_split_time.hours().count()) +
                       ":" + end_time_result.substr(2);
   else
     end_time_result = end_time_str;
   return {start_time_result, end_time_result};
 }
+//to verify:
+std::pair<string, string> TransportTable::format_time_test() const {
+  const auto start_zoned =
+      std::chrono::zoned_time{std::chrono::current_zone(), time_};
+  const auto end_zoned = std::chrono::zoned_time{std::chrono::current_zone(),
+                                                 time_ + std::chrono::hours(3)};
 
-void transporttable::generate_table() {
+  auto format_gtfs_time = [](const auto& zoned_time) -> string {
+    const auto local_time = zoned_time.get_local_time();
+    const auto tod = local_time - std::chrono::floor<std::chrono::days>(local_time);
+    const std::chrono::hh_mm_ss split{tod};
+
+    int hours = static_cast<int>(split.hours().count());
+
+    if (hours >= 0 && hours < 4) {
+      hours += 24;
+    }
+
+    return std::format("{:02d}:{:02d}:{:02d}",
+                       hours,
+                       static_cast<int>(split.minutes().count()),
+                       static_cast<int>(split.seconds().count()));
+  };
+
+  return {format_gtfs_time(start_zoned), format_gtfs_time(end_zoned)};
+}
+
+void TransportTable::generate_table() {
   Config::load();
-  auto [start_time, end_time] = format_time();
+  auto [start_time, end_time] = format_time_test();
   string weekday = "c." + std::format("{:%A}", time_);
   string current_date = std::format("{:%Y-%m-%d}", time_);
   std::ranges::transform(weekday, weekday.begin(),
@@ -55,7 +82,7 @@ void transporttable::generate_table() {
   transaction.commit();
 }
 
-void transporttable::printtable() {
+void TransportTable::printtable() {
   std::cout << table_.size() << std::endl;
   for (const auto& [a, trips] : table_) {
     std::cout << a.first << " " << a.second << std::endl;

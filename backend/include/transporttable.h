@@ -48,13 +48,13 @@ struct Trip {
   std::string trip_id;
 };
 
-class transporttable {
+class TransportTable {
 public:
   std::unordered_map<std::pair<std::string, std::string>, std::vector<Trip>,
                    PairHash>
     table_;
 
-  transporttable(std::string q = default_query,
+  TransportTable(std::string q = default_query,
                  const std::chrono::time_point<std::chrono::system_clock> t =
                      std::chrono::system_clock::now())
       : query_{std::move(q)}, time_{t} {};
@@ -68,6 +68,7 @@ private:
    *
    * @return A (time, time limit) pair formatted for the query.
    */
+  std::pair<std::string, std::string> format_time_test() const;
   std::pair<std::string, std::string> format_time() const;
 public:
   //helper members;

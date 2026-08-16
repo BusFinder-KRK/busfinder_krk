@@ -1,8 +1,7 @@
 #include <fstream>
 #include <routing.h>
 #include <queue>
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+
 //==================================================
 //TO DO FOR OVERREAL PERFOMANCE
 //maybe later switch the line ID to be and integer since ints are faster: for exaple instead of doing "walk" do a -1 or sth
@@ -21,17 +20,35 @@ Routing::Routing(std::chrono::time_point<std::chrono::system_clock> time) : sf_(
     std::cout << "inside the constructor" << '\n';
     ttable_.generate_table();
     std::cout << "after generate" << '\n';
-    load_walking_json();
+    load_walking_csv();
 }
 
-void Routing::load_walking_json() {
+void Routing::load_walking_csv() {
     //i didn't make any checking for debuging but i might add it later
-    std::ifstream file(json_path_);
-    if (file.is_open()) {
-        json j;
-        file >> j;
-        walking_times_ = j.get<std::unordered_map<std::string, int>>();
+    std::ifstream file(csv_path_);
+    if (!file.is_open()) {
+        std::cout << "couldnt open the csv" << '\n';
+        return;
     }
+    std::string line;
+    std::stringstream ss;
+    std::string stop1, stop2;
+    float time_min;
+
+    while (std::getline(file, line)) {
+        if (!line.empty()) {
+            ss.clear();
+            ss.str(line);
+            if (ss >> stop1 >> stop2 >> time_min) {
+                    //LATER CHANGE THIS SO its a pair and not one string
+                    std::string key = stop1 + "," + stop2;
+                    int time_minutes = static_cast<int>(std::round(time_min));
+
+                    walking_times_[key] = time_minutes;
+                }
+            }
+        }
+
 }
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
