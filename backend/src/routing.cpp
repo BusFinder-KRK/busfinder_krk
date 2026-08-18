@@ -53,6 +53,10 @@ void Routing::load_walking_csv() {
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
     std::cout << "we are in transport, size: " << ttable_.table_.size() << '\n';
+    auto test = ttable_.table_.begin();
+    std::cout << "first in ttable: " << test->first.first << " "<< test->first.second << '\n';
+    std::cout << "the stops: " << stop_id1 << " " << stop_id2 << '\n';
+
 
     std::vector<Routing::NodeTransport> result;
     std::string houradmin = std::format("{:%H:%M}", time);
@@ -184,7 +188,6 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
      *arrival
      *
      *  ROCORD OF DISTACES = MAP:
-     *  [NODE] = [time from start of the journy, time the bus takes off, line ID]
      *  [NODE] = [NODE_TIME_INFO]
      *
      *  PQ
@@ -213,28 +216,28 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     while (!pq.empty()) {
         auto [old_cost, old_node] = pq.top();
         pq.pop();
-        std::cout << "old cost: " << old_cost << " stop name: " << old_node.stop_name << " line :" << old_node.line_id << '\n';
-        std::cout << old_node.stop_name << " " << target << '\n';
+        //std::cout << "old cost: " << old_cost << " stop name: " << old_node.stop_name << " line :" << old_node.line_id << '\n';
+        //std::cout << old_node.stop_name << " " << target << '\n';
         if (old_node.stop_name == target) {
             ending_node = old_node;
             break;
         }
         if (old_cost > record_of_distances[old_node].time_from_start) continue;
         //here is the porblem!!!
-        int time_to_arrive;
-        std::cout << "hello???" << '\n';
+        float time_to_arrive;
+        std::cout << "hello??? size of the pq: " << pq.size() << '\n';
         for (const auto &[new_stop, distance]: sf_.find_stop_ids(old_node.stop_name)) {
-            std::cout << "we found the stop ids?" << '\n';
+            //std::cout << "we found the stop ids?" << '\n';
             if (new_stop != old_node.stop_name) {
                 std::vector<NodeTransport>result = transport_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                 if (result.empty()) {
                     result = walking_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                     if (result.empty()) {
                         //safty net - zeby graf sie nie rozspujnil
-                        int dist_meters = distance * 1609.344;
-                        time_to_arrive = std::ceil(dist_meters / this->walking_pace) * 5; //huge punishemnd so the algo is scared of this option, counted in minutes
+                        //both distamce and walking pace are ints
+                        time_to_arrive = std::ceil(distance / this->walking_pace) * 5; //huge punishemnd so the algo is scared of this option, counted in minutes
                         std::string line_id = "walk - safety net";
-                        std::chrono::time_point<std::chrono::system_clock> arrival_at_B = record_of_distances[old_node].real_time + std::chrono::minutes(time_to_arrive);
+                        std::chrono::time_point<std::chrono::system_clock> arrival_at_B = record_of_distances[old_node].real_time + std::chrono::minutes(static_cast<int>(time_to_arrive));
                         NodeTransport nt{line_id, record_of_distances[old_node].real_time, arrival_at_B};
                         result.push_back(nt);
                     }
@@ -243,11 +246,14 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                     if (node.line_id != "walk - safety net") {
                         auto delta = node.arrival - record_of_distances[old_node].real_time;
                         auto total_seconds = std::chrono::duration_cast<std::chrono::seconds>(delta).count();
-                        time_to_arrive = static_cast<int>(std::ceil(total_seconds / 60.0f));
+                        time_to_arrive = total_seconds / 60.0f;
                     }
                     //this will be usefull if we will want to punish for walking:
                     if (node.line_id == "walk")time_to_arrive *= walking_multiplier;
-                    if (old_node.line_id !="walk" and old_node.line_id != "walk - safety net")time_to_arrive += this->time_for_change;
+                    if (old_node.line_id !="walk" and old_node.line_id != "walk - safety net") {
+                        if (old_node.line_id != node.line_id)time_to_arrive += this->time_for_change;
+
+                    }
 
                     Node n{new_stop, node.line_id};
                     if (!record_of_distances.contains(n)) {

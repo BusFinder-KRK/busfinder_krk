@@ -25,7 +25,7 @@ public:
     };
 
     struct NodeTimeInfo {
-        int time_from_start; //time from start of the journy (change to time type later?)
+        float time_from_start; //time from start of the journy (change to time type later?)
         std::chrono::time_point<std::chrono::system_clock> real_time; // for example 15:49:23
         //in python there was also the line id here again?
     };
@@ -42,8 +42,7 @@ public:
 
 
 private:
-    //this is hardcoded - should i make it not hardcoded?
-    std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
+    std::filesystem::path csv_path_ = WALKING_CSV_PATH;
     std::unordered_map<std::string, int> walking_times_;
     TransportTable ttable_;
     StopFinder sf_;

@@ -50,4 +50,6 @@ configure_file(
         COPYONLY
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+target_compile_definitions(backend PRIVATE
+        WALKING_CSV_PATH="${CMAKE_CURRENT_SOURCE_DIR}/scripts/walking_times/walking_times.csv"
+)

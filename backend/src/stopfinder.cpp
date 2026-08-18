@@ -69,7 +69,7 @@ void StopFinder::generate_map() {
 //=====================
 std::vector<std::pair<std::string, float>>
 StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
-  std::cout << "we are isnide find stop ids, size: "<< coordinates_.size() << '\n';
+  //std::cout << "we are isnide find stop ids, size: "<< coordinates_.size() << '\n';
   auto test = coordinates_.begin();
   std::cout << test->first << " " << test->second.first << " " << test->second.second << '\n';
 
