@@ -11,7 +11,7 @@
 #include <iostream>
 
 inline std::string default_query = R"(
-                SELECT DISTINCT s1.stop_id, s2.stop_id, s1.arrival_time, s2.arrival_time, s1.trip_id
+                SELECT DISTINCT s1.stop_id, s2.stop_id, s1.arrival_time, s2.arrival_time, r.route_id
                 FROM stop_times s1
                 JOIN stop_times s2 ON s1.trip_id = s2.trip_id
                 JOIN trips t ON s1.trip_id = t.trip_id
