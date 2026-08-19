@@ -23,7 +23,8 @@ inline std::string default_query = R"(
                   cd.exception_type = 1
                   OR
                   (
-                  $3::DATE BETWEEN c.start_date AND c.end_date AND (cd.exception_type IS NULL OR cd.exception_type != 2)
+                  $3::DATE BETWEEN c.start_date AND c.end_date AND (cd.exception_type IS NULL OR cd.exception_type <> 2)
+                  AND {} = 1
                   )
                 )
                 AND s1.trip_id = s2.trip_id

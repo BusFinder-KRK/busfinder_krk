@@ -26,19 +26,19 @@ public:
 
     struct NodeTimeInfo {
         float cost_from_start; //time from start of the journy (change to time type later?)
-        std::chrono::time_point<std::chrono::system_clock> real_time; // for example 15:49:23
+        std::chrono::zoned_time<std::chrono::seconds> real_time; // for example 15:49:23
         //in python there was also the line id here again?
     };
 
     struct NodeTransport {
         std::string line_id;
-        std::chrono::time_point<std::chrono::system_clock> departure;
-        std::chrono::time_point<std::chrono::system_clock> arrival;
+        std::chrono::zoned_time<std::chrono::seconds> departure;
+        std::chrono::zoned_time<std::chrono::seconds> arrival;
     };
 
-    Routing(std::chrono::time_point<std::chrono::system_clock> time);//konstruktor ktory bedzie zmieniac parametry wyzej?
+    Routing(std::chrono::zoned_time<std::chrono::seconds> time);//konstruktor ktory bedzie zmieniac parametry wyzej?
     //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
-    std::vector<std::pair<Node, NodeTimeInfo>> output(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<std::pair<Node, NodeTimeInfo>> output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
 
 private:
@@ -49,14 +49,14 @@ private:
 
     void load_walking_csv();
 
-    std::vector<NodeTransport> transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-    std::vector<NodeTransport> transport_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-    std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
-    std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<NodeTransport> transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<NodeTransport> transport_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::time_point<std::chrono::system_clock> time);
+    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
 };
 
