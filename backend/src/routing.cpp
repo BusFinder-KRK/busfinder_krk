@@ -52,10 +52,10 @@ void Routing::load_walking_csv() {
 }
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
-    std::cout << "we are in transport, size: " << ttable_.table_.size() << '\n';
+    //std::cout << "we are in transport, size: " << ttable_.table_.size() << '\n';
     auto test = ttable_.table_.begin();
-    std::cout << "first in ttable: " << test->first.first << " "<< test->first.second << '\n';
-    std::cout << "the stops: " << stop_id1 << " " << stop_id2 << '\n';
+    //std::cout << "first in ttable: " << test->first.first << " "<< test->first.second << '\n';
+    //std::cout << "the stops: " << stop_id1 << " " << stop_id2 << '\n';
 
 
     std::vector<Routing::NodeTransport> result;
@@ -80,8 +80,8 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std:
             auto t1 = midnight + std::chrono::minutes(minutes_1);
             auto t2 = midnight + std::chrono::minutes(minutes_2);
             NodeTransport nt {option.trip_id, t1, t2};
-            std::cout << "node: " << nt.line_id << " " << std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.departure)) << " "
-          << std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.arrival)) << '\n';
+            //std::cout << "node: " << nt.line_id << " " << std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.departure)) << " "
+          //<< std::format("{:%T}", std::chrono::floor<std::chrono::seconds>(nt.arrival)) << '\n';
             result.push_back(nt);
             if (t1 > time + std::chrono::minutes(search_window))break;
         }
@@ -169,7 +169,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse( cons
 }
 
 std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
-                                        std::chrono::time_point<std::chrono::system_clock> time) {
+                                        std::chrono::time_point<std::chrono::system_clock> time)  {
     /* PLAN:
      * - record of distances - the table so far, so its easy to look up the nodes
      * - prev - table with prevous nodes
@@ -202,9 +202,9 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     std::map<Node, Node> prev;
     record_of_distances[start_node] = start_node_time;
     std::priority_queue<
-        std::pair<int, Node>,
-        std::vector<std::pair<int, Node> >,
-        std::greater<std::pair<int, Node> >
+        std::pair<float, Node>,
+        std::vector<std::pair<float, Node> >,
+        std::greater<std::pair<float, Node> >
     > pq;
     pq.emplace(0, start_node);
     Node ending_node;
@@ -216,26 +216,26 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     while (!pq.empty()) {
         auto [old_cost, old_node] = pq.top();
         pq.pop();
-        //std::cout << "old cost: " << old_cost << " stop name: " << old_node.stop_name << " line :" << old_node.line_id << '\n';
-        //std::cout << old_node.stop_name << " " << target << '\n';
+        std::cout << "hello??? size of the pq: " << pq.size() << '\n';
+        std::cout << old_cost << " " << old_node.stop_name << " " << old_node.line_id << '\n';
         if (old_node.stop_name == target) {
             ending_node = old_node;
             break;
         }
-        if (old_cost > record_of_distances[old_node].time_from_start) continue;
-        //here is the porblem!!!
+        if (old_cost > record_of_distances[old_node].cost_from_start) continue;
         float time_to_arrive;
-        std::cout << "hello??? size of the pq: " << pq.size() << '\n';
+        float add_cost;
+
         for (const auto &[new_stop, distance]: sf_.find_stop_ids(old_node.stop_name)) {
-            //std::cout << "we found the stop ids?" << '\n';
+            std::cout << new_stop << " and " << old_node.stop_name << '\n';
             if (new_stop != old_node.stop_name) {
                 std::vector<NodeTransport>result = transport_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                 if (result.empty()) {
                     result = walking_between_stops(old_node.stop_name, new_stop, record_of_distances[old_node].real_time);
                     if (result.empty()) {
                         //safty net - zeby graf sie nie rozspujnil
-                        //both distamce and walking pace are ints
-                        time_to_arrive = std::ceil(distance / this->walking_pace) * 5; //huge punishemnd so the algo is scared of this option, counted in minutes
+                        time_to_arrive = std::ceil(distance / this->walking_pace);
+                        add_cost = time_to_arrive*5;//huge punishemnd so the algo is scared of this option, counted in minutes
                         std::string line_id = "walk - safety net";
                         std::chrono::time_point<std::chrono::system_clock> arrival_at_B = record_of_distances[old_node].real_time + std::chrono::minutes(static_cast<int>(time_to_arrive));
                         NodeTransport nt{line_id, record_of_distances[old_node].real_time, arrival_at_B};
@@ -247,30 +247,35 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                         auto delta = node.arrival - record_of_distances[old_node].real_time;
                         auto total_seconds = std::chrono::duration_cast<std::chrono::seconds>(delta).count();
                         time_to_arrive = total_seconds / 60.0f;
+                        add_cost = time_to_arrive;
                     }
                     //this will be usefull if we will want to punish for walking:
-                    if (node.line_id == "walk")time_to_arrive *= walking_multiplier;
+                    if (node.line_id == "walk")add_cost *= walking_multiplier;
                     if (old_node.line_id !="walk" and old_node.line_id != "walk - safety net") {
-                        if (old_node.line_id != node.line_id)time_to_arrive += this->time_for_change;
-
+                        if (old_node.line_id != node.line_id)add_cost += this->time_for_change;
                     }
 
                     Node n{new_stop, node.line_id};
+                    std::cout << "the new node: " << n.line_id << " " << n.stop_name << " " << old_cost + add_cost << " " << node.arrival << '\n';
+
                     if (!record_of_distances.contains(n)) {
-                        NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
+                        std::cout << "new node(stop+line)" << '\n';
+                        NodeTimeInfo nt {old_cost + add_cost, node.arrival};
                         record_of_distances[n] = nt;
                         //std::cout << old_cost + time_to_arrive << " "<<n.line_id << " " << n.stop_name << '\n';
-                        pq.emplace(old_cost + time_to_arrive, n);
+                        pq.emplace(old_cost + add_cost, n);
                         prev[n] = old_node;
                     }
                     else {
-                        if (record_of_distances[n].time_from_start > old_cost + time_to_arrive) {
-                            NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
+                        if (record_of_distances[n].cost_from_start > old_cost + add_cost) {
+                            std::cout << "better cost:]" << '\n';
+                            NodeTimeInfo nt {old_cost + add_cost, node.arrival};
                             record_of_distances[n] = nt;
-                            pq.emplace(old_cost + time_to_arrive, n);
+                            pq.emplace(old_cost + add_cost, n);
                             prev[n] = old_node;
                         }
                     }
+                    std::cout << "=================" << '\n';
                 }
 
             }
@@ -296,7 +301,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     std::reverse(help.begin(), help.end());
     std::vector<std::pair<Node, NodeTimeInfo>> ans;
     for (const auto& node : help) {
-        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].time_from_start << '\n';
+        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].cost_from_start << '\n';
         //TO JEST DO ZMIANY W ZALEZNOSCI OD TEGO JAKIE INFO CHCEMY! i chyba pasuje jednak to dego NodeTimeInfo dodac nazwe liniji bo innaczje bedzie pokazywac wczesniejsza i belive
         ans.emplace_back(node, record_of_distances[node]);
     }
@@ -331,7 +336,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
             ending_node = old_node;
             break;
         }
-        if (old_cost > record_of_distances[old_node].time_from_start) continue;
+        if (old_cost > record_of_distances[old_node].cost_from_start) continue;
         //StopFinder sf{adjacent_stops}; we moved it upward to be faster
         int time_to_arrive;
         for (const auto &[new_stop, distance]: sf_.find_stop_ids(old_node.stop_name)) {
@@ -370,7 +375,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
                         prev[n] = old_node;
                     }
                     else {
-                        if (record_of_distances[n].time_from_start > old_cost + time_to_arrive) {
+                        if (record_of_distances[n].cost_from_start > old_cost + time_to_arrive) {
                             NodeTimeInfo nt {old_cost + time_to_arrive, node.arrival};
                             record_of_distances[n] = nt;
                             pq.emplace(old_cost + time_to_arrive, n);
@@ -397,7 +402,7 @@ std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>> Routing::dijkstra_d
     std::reverse(help.begin(), help.end());
     std::vector<std::pair<Node, NodeTimeInfo>> ans;
     for (const auto& node : help) {
-        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].time_from_start << '\n';
+        std::cout << node.line_id << " " << node.stop_name << " " << std::format("{:%T}", record_of_distances[node].real_time) << " " << record_of_distances[node].cost_from_start << '\n';
         //TO JEST DO ZMIANY W ZALEZNOSCI OD TEGO JAKIE INFO CHCEMY! i chyba pasuje jednak to dego NodeTimeInfo dodac nazwe liniji bo innaczje bedzie pokazywac wczesniejsza i belive
         ans.emplace_back(node, record_of_distances[node]);
     }

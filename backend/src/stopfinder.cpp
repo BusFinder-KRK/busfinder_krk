@@ -71,12 +71,12 @@ std::vector<std::pair<std::string, float>>
 StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   //std::cout << "we are isnide find stop ids, size: "<< coordinates_.size() << '\n';
   auto test = coordinates_.begin();
-  std::cout << test->first << " " << test->second.first << " " << test->second.second << '\n';
+  //std::cout << test->first << " " << test->second.first << " " << test->second.second << '\n';
 
   auto it = coordinates_.find(stopid);
   if (it == coordinates_.end())
     return {};
-  std::cout << "we found the trip" << '\n';
+  //std::cout << "we found the trip" << '\n';
   auto [x, y] = it->second;
   float points[2] = {x, y};
   std::vector<size_t> out_indices(number_of_stops);

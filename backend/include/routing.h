@@ -15,7 +15,7 @@ public:
     const double time_for_change{0.5};
     const int walking_multiplier{1};
     const int walking_pace{60};
-    const int adjacent_stops{20};
+    const int adjacent_stops{30};
 
     struct Node {
         std::string stop_name; // for example "Kapelanka07"
@@ -25,7 +25,7 @@ public:
     };
 
     struct NodeTimeInfo {
-        float time_from_start; //time from start of the journy (change to time type later?)
+        float cost_from_start; //time from start of the journy (change to time type later?)
         std::chrono::time_point<std::chrono::system_clock> real_time; // for example 15:49:23
         //in python there was also the line id here again?
     };
