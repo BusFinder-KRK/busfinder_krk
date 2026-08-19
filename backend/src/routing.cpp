@@ -53,13 +53,14 @@ void Routing::load_walking_csv() {
 
 std::vector<Routing::NodeTransport> Routing::transport_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::time_point<std::chrono::system_clock> time) {
     //std::cout << "we are in transport, size: " << ttable_.table_.size() << '\n';
-    auto test = ttable_.table_.begin();
+    //auto test = ttable_.table_.begin();
     //std::cout << "first in ttable: " << test->first.first << " "<< test->first.second << '\n';
     //std::cout << "the stops: " << stop_id1 << " " << stop_id2 << '\n';
 
 
     std::vector<Routing::NodeTransport> result;
-    std::string houradmin = std::format("{:%H:%M}", time);
+    auto local_time = std::chrono::zoned_time{std::chrono::current_zone(), time}.get_local_time();
+    std::string houradmin = std::format("{:%H:%M}", local_time);
     auto midnight = std::chrono::floor<std::chrono::days>(time);
 
     auto it = ttable_.table_.find({stop_id1, stop_id2});

@@ -55,8 +55,8 @@ void StopFinder::generate_map() {
   pqxx::work transaction{*connection_};
   for (const auto &[stopid, lan, lon] :
        transaction.query<std::string, float, float>(filled_query)) {
-    coordinates_[stopid] = {lan, lon};
     StopData sd(stopid, lan, lon);
+    coordinates_[stopid] = {static_cast<float>(sd.x), static_cast<float>(sd.y)};
     ks.tree_vec_.push_back(sd);
   }
   transaction.commit();
