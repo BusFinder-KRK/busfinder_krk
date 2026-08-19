@@ -24,7 +24,6 @@ Routing::Routing(std::chrono::time_point<std::chrono::system_clock> time) : sf_(
 }
 
 void Routing::load_walking_csv() {
-    //i didn't make any checking for debuging but i might add it later
     std::ifstream file(csv_path_);
     if (!file.is_open()) {
         std::cout << "couldnt open the csv" << '\n';
@@ -35,19 +34,12 @@ void Routing::load_walking_csv() {
     std::string stop1, stop2;
     float time_min;
 
-    while (std::getline(file, line)) {
-        if (!line.empty()) {
-            ss.clear();
-            ss.str(line);
-            if (ss >> stop1 >> stop2 >> time_min) {
-                    //LATER CHANGE THIS SO its a pair and not one string
-                    std::string key = stop1 + "," + stop2;
-                    int time_minutes = static_cast<int>(std::round(time_min));
-
-                    walking_times_[key] = time_minutes;
-                }
-            }
-        }
+    while(file >> stop1 >> stop2 >> time_min) {
+        //LATER CHANGE THIS SO its a pair and not one string
+        std::string key = stop1 + "," + stop2;
+        int time_minutes = static_cast<int>(std::round(time_min));
+        walking_times_[key] = time_minutes;
+    }
 
 }
 
