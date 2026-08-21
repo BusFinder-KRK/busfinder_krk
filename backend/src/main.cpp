@@ -4,7 +4,7 @@
 
 int main() {
   auto start = std::chrono::system_clock::now();
-  std::cout << "starting\n";
+  std::cout << "starting \n";
   // new names WE CAN NOW CHANE IT TO INT
   //  no we cannot bc the tram ones are not int
   std::string biprostal = "7420";
