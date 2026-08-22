@@ -181,7 +181,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
             time.get_time_zone(),
             local_timepoint - std::chrono::minutes(it->second)
         };
-        NodeTransport nt{"walk", t1, time};
+        NodeTransport nt{"walk", time, t1};
         vec.push_back(nt);
         return vec;
     }
@@ -192,7 +192,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
             time.get_time_zone(),
             local_timepoint - std::chrono::minutes(it->second)
         };
-        NodeTransport nt{"walk", t1, time};
+        NodeTransport nt{"walk", time, t1};
         vec.push_back(nt);
         return vec;
     }
@@ -329,24 +329,28 @@ std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_d
         return std::nullopt;
     }
 
-    // std::vector<Node> help;
-    // help.push_back(ending_node);
-    //
-    // while (!help.empty() && help.back().stop_name != start) {
-    //     if (!prev.contains(help.back()))
-    //         break;
-    //     help.push_back((prev[help.back()]));
-    // }
-    // // change: reverse
-    // std::reverse(help.begin(), help.end());
-    // std::vector<std::pair<Node, NodeTimeInfo> > ans;
-    // for (const auto &node: help) {
-    //     std::cout << node.line_id << " " << node.stop_name << " "
-    //             << std::format("{:%T}", record_of_distances[node].real_time)
-    //             << " " << record_of_distances[node].cost_from_start << '\n';
-    //     ans.emplace_back(node, record_of_distances[node]);
-    // }
-    // std::cout<< "we are done with dijkstra" << '\n';
+    //////////JUST FOR TESTING (COMPARING):
+    std::vector<Node> help;
+    help.push_back(ending_node);
+
+    while (!help.empty() && help.back().stop_name != start) {
+        if (!prev.contains(help.back()))
+            break;
+        help.push_back((prev[help.back()]));
+    }
+    // change: reverse
+    std::reverse(help.begin(), help.end());
+    std::vector<std::pair<Node, NodeTimeInfo> > ans;
+    std::cout << "normal dijkstra" << '\n';
+
+    for (const auto &node: help) {
+        std::cout << node.line_id << " " << node.stop_name << " "
+                << std::format("{:%T}", record_of_distances[node].real_time)
+                << " " << record_of_distances[node].cost_from_start << '\n';
+        ans.emplace_back(node, record_of_distances[node]);
+    }
+    std::cout << '\n';
+    //////////DELETE AFTER
     return record_of_distances[ending_node].real_time;
 }
 
@@ -371,9 +375,9 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
     while (!pq.empty()) {
         auto [old_cost, old_node] = pq.top();
         pq.pop();
-        std::cout << "hello??? size of the pq: " << pq.size() << '\n';
+        //std::cout << "hello??? size of the pq: " << pq.size() << '\n';
 
-        std::cout << old_cost << " " << old_node.stop_name << " " << old_node.line_id << '\n';
+        //std::cout << old_cost << " " << old_node.stop_name << " " << old_node.line_id << '\n';
         if (old_node.stop_name == target) {
             ending_node = old_node;
             break;
@@ -414,9 +418,7 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
                 }
                 for (const auto &node: result) {
                     if (node.line_id != "walk - safety net") {
-                        auto delta =
-
-                                record_of_distances[old_node].real_time.get_local_time() - node.arrival.get_local_time();
+                        auto delta =record_of_distances[old_node].real_time.get_local_time() - node.arrival.get_local_time();
                         auto total_seconds =
                                 std::chrono::duration_cast<std::chrono::seconds>(delta).count();
                         time_to_arrive = total_seconds / 60.0f;
@@ -433,7 +435,7 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
                     }
 
                     Node n{new_stop, node.line_id};
-                    std::cout << "the new node: " << n.line_id << " " << n.stop_name << " " << old_cost + add_cost << " " << node.arrival << '\n';
+                    //std::cout << "the new node: " << n.line_id << " " << n.stop_name << " " << old_cost + add_cost << " " << node.arrival << '\n';
 
                     if (!record_of_distances.contains(n)) {
                         NodeTimeInfo nt{old_cost + add_cost, node.arrival};
@@ -468,7 +470,8 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
             break;
         help.push_back((prev[help.back()]));
     }
-
+    std::cout << "==================" << '\n';
+    std::cout << "reversed dijkstra" << '\n';
     std::vector<std::pair<Node, NodeTimeInfo> > ans;
     for (const auto &node: help) {
         std::cout << node.line_id << " " << node.stop_name << " "
@@ -484,6 +487,5 @@ Routing::output(const std::string &start, const std::string &target,
                 std::chrono::zoned_time<std::chrono::seconds> time) {
     auto arrival = dijkstra_dalekowzrocznosc(start, target, time);
     if (!arrival)return {};
-    std::cout << " time " << std::format("{:%T}", *arrival) << '\n';
     return dijkstra_dalekowzrocznosc_reversed(target, start, *arrival);
 }
