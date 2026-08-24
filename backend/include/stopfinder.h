@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-inline std::string def_query = R"(
+inline std::string test_query = R"(
                 SELECT stop_id, stop_lat, stop_lon FROM stops
                 )";
 

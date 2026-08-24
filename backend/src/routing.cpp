@@ -3,6 +3,8 @@
 #include <queue>
 #include <routing.h>
 
+////PROBLEM WITH REVERSED DIJKSTRA - FIX WALK IN THE FIRST BIT!
+
 //==================================================
 // TO DO FOR OVERREAL PERFOMANCE
 // maybe later switch the line ID to be and integer since ints are faster: for
@@ -21,12 +23,13 @@ bool operator<(const Routing::Node &n1, const Routing::Node &n2) {
 // for the routing:
 
 Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time)
-    : sf_(adjacent_stops), ttable_(default_query, time.get_sys_time()) {
+    : sf_(adjacent_stops), ttable_(default_query, time.get_sys_time()),translator_() {
     std::cout << "we are in routing constructor" << '\n';
     ttable_.generate_table();
     std::cout << "the table was generated" << '\n';
     load_walking_csv();
     std::cout << "the csv was loaded" << '\n';
+
 }
 
 void Routing::load_walking_csv() {
@@ -344,9 +347,7 @@ std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_d
     std::cout << "normal dijkstra" << '\n';
 
     for (const auto &node: help) {
-        std::cout << node.line_id << " " << node.stop_name << " "
-                << std::format("{:%T}", record_of_distances[node].real_time)
-                << " " << record_of_distances[node].cost_from_start << '\n';
+        std::cout << translator_.get_human_line(node.line_id) <<  " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].real_time) << '\n';
         ans.emplace_back(node, record_of_distances[node]);
     }
     std::cout << '\n';
@@ -474,9 +475,7 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
     std::cout << "reversed dijkstra" << '\n';
     std::vector<std::pair<Node, NodeTimeInfo> > ans;
     for (const auto &node: help) {
-        std::cout << node.line_id << " " << node.stop_name << " "
-                << std::format("{:%T}", record_of_distances[node].real_time)
-                << " " << record_of_distances[node].cost_from_start << '\n';
+        std::cout << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].real_time) << '\n';
         ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;

@@ -8,6 +8,7 @@
 #include  <unordered_map>
 #include "transporttable.h"
 #include "stopfinder.h"
+#include "translator.h"
 
 class Routing {
 public:
@@ -46,6 +47,7 @@ private:
     std::unordered_map<std::string, int> walking_times_;
     TransportTable ttable_;
     StopFinder sf_;
+    Translator translator_;
 
     void load_walking_csv();
 

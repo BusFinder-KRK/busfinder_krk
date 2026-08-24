@@ -50,7 +50,7 @@ StopFinder::StopFinder(const int &num)
 void StopFinder::generate_map() {
   Config::load();
   const std::string filled_query =
-      std::vformat(def_query, std::make_format_args(number_of_stops));
+      std::vformat(test_query, std::make_format_args(number_of_stops));
   connection_.emplace(Config::connection_string);
   pqxx::work transaction{*connection_};
   for (const auto &[stopid, lan, lon] :
