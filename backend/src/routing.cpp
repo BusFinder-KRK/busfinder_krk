@@ -3,7 +3,7 @@
 #include <queue>
 #include <routing.h>
 
-////PROBLEM WITH REVERSED DIJKSTRA - FIX WALK IN THE FIRST BIT!
+////MAKE SURE THAT DEPARTURE AND ARRIVAL IN REVERESED IS GOOD
 
 //==================================================
 // TO DO FOR OVERREAL PERFOMANCE
@@ -202,7 +202,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
     return vec;
 }
 
-std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_dalekowzrocznosc(
+std::optional<std::pair<std::chrono::zoned_time<std::chrono::seconds>, std::string>> Routing::dijkstra_dalekowzrocznosc(
     const std::string &start, const std::string &target,
     std::chrono::zoned_time<std::chrono::seconds> time) {
     std::cout<< "we are inisde dijkstra" << '\n';
@@ -232,7 +232,7 @@ std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_d
      *  PREV
      *  [NODE, NODE]
      */
-    Node start_node{start, "walk"};
+    Node start_node{start, "start"};
     NodeTimeInfo start_node_time{0, time};
     std::map<Node, NodeTimeInfo> record_of_distances;
     std::map<Node, Node> prev;
@@ -299,11 +299,11 @@ std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_d
                     // this will be usefull if we will want to punish for walking:
                     if (node.line_id == "walk")
                         add_cost *= walking_multiplier;
-                    if (old_node.line_id != "walk" and
-                        old_node.line_id != "walk - safety net") {
-                        if (old_node.line_id != node.line_id)
-                            add_cost += this->time_for_change;
-                    }
+
+                    bool is_node_not_walk = (node.line_id != "walk" && node.line_id != "walk - safety net");
+                    bool is_old_node_not_walk = (old_node.line_id != "walk" && old_node.line_id != "walk - safety net");
+
+                    if (is_node_not_walk && is_old_node_not_walk && old_node.line_id != node.line_id) add_cost += this->time_for_change;
 
                     Node n{new_stop, node.line_id};
                     //std::cout << "the new node: " << n.line_id << " " << n.stop_name << " " << old_cost + add_cost << " " << node.arrival << '\n';
@@ -352,15 +352,15 @@ std::optional<std::chrono::zoned_time<std::chrono::seconds>> Routing::dijkstra_d
     }
     std::cout << '\n';
     //////////DELETE AFTER
-    return record_of_distances[ending_node].real_time;
+    return std::make_pair(record_of_distances[ending_node].real_time, ending_node.line_id);
 }
 
 std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo> >
 Routing::dijkstra_dalekowzrocznosc_reversed(
     const std::string &start, const std::string &target,
-    std::chrono::zoned_time<std::chrono::seconds> time) {
+    std::chrono::zoned_time<std::chrono::seconds> time, std::string ending_line) {
 
-    Node start_node{start, "walk"};
+    Node start_node{start, ending_line};
     NodeTimeInfo start_node_time{0, time};
     std::map<Node, NodeTimeInfo> record_of_distances;
     std::map<Node, Node> prev;
@@ -425,15 +425,16 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
                         time_to_arrive = total_seconds / 60.0f;
                         add_cost = time_to_arrive;
                     }
+                    bool is_node_not_walk = (node.line_id != "walk" && node.line_id != "walk - safety net");
+                    bool is_old_node_not_walk = (old_node.line_id != "walk" && old_node.line_id != "walk - safety net");
 
+                    if (!is_node_not_walk && !is_old_node_not_walk)continue;
 
                     if (node.line_id == "walk")
                         add_cost *= walking_multiplier;
-                    if (old_node.line_id != "walk" and
-                        old_node.line_id != "walk - safety net") {
-                        if (old_node.line_id != node.line_id)
-                            add_cost += this->time_for_change;
-                    }
+
+                    if (is_node_not_walk && is_old_node_not_walk && old_node.line_id != node.line_id) add_cost += this->time_for_change;
+
 
                     Node n{new_stop, node.line_id};
                     //std::cout << "the new node: " << n.line_id << " " << n.stop_name << " " << old_cost + add_cost << " " << node.arrival << '\n';
@@ -447,7 +448,7 @@ Routing::dijkstra_dalekowzrocznosc_reversed(
                         prev[n] = old_node;
                     } else {
                         if (record_of_distances[n].cost_from_start > old_cost + add_cost) {
-                            NodeTimeInfo nt{old_cost + add_cost, node.departure};
+                            NodeTimeInfo nt{old_cost + add_cost, node.arrival};
                             record_of_distances[n] = nt;
                             pq.emplace(old_cost + add_cost, n);
                             prev[n] = old_node;
@@ -486,5 +487,7 @@ Routing::output(const std::string &start, const std::string &target,
                 std::chrono::zoned_time<std::chrono::seconds> time) {
     auto arrival = dijkstra_dalekowzrocznosc(start, target, time);
     if (!arrival)return {};
-    return dijkstra_dalekowzrocznosc_reversed(target, start, *arrival);
+    const auto &arrival_time = arrival->first;
+    const auto &line_id = arrival->second;
+    return dijkstra_dalekowzrocznosc_reversed(target, start, arrival_time, line_id);
 }

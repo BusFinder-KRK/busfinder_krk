@@ -56,9 +56,9 @@ private:
     std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
     std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::optional<std::chrono::zoned_time<std::chrono::seconds>>  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::optional<std::pair<std::chrono::zoned_time<std::chrono::seconds>, std::string>>  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time, std::string ending_line);
 
 };
 

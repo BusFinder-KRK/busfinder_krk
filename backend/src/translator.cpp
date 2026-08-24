@@ -26,6 +26,7 @@ void Translator::generate_lines() {
         line_[service] = route_id;
        }
     line_["walk"] = "walk";
+    line_["start"] = "start";
     transaction.commit();
 }
 
