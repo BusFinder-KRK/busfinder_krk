@@ -17,7 +17,7 @@ api::api() {
       return crow::response(400, "Missing 'time' parameter");
 
     const route_data route;
-    return make_default_response(route);
+    return crow::response(make_default_response(route));
   });
 
   CROW_ROUTE(app_, "/route/route_coords")
@@ -40,7 +40,7 @@ api::api() {
       return crow::response(400, "Missing 'time' parameter");
 
     const route_data route;
-    return make_default_response(route);
+    return crow::response(make_default_response(route));
   });
 }
 
