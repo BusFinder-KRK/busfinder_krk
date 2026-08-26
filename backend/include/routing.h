@@ -33,7 +33,7 @@ public:
     };
 
     struct NodeTransport {
-        std::string line_id;
+        std::string line_id; //can i get rid of this one here?
         std::chrono::zoned_time<std::chrono::seconds> departure;
         std::chrono::zoned_time<std::chrono::seconds> arrival;
     };
@@ -58,7 +58,7 @@ private:
     std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
     std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>>  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
     std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time, std::string ending_line);
 
