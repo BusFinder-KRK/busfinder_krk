@@ -9,6 +9,7 @@
 #include "transporttable.h"
 #include "stopfinder.h"
 #include "translator.h"
+#include "route_data.h"
 
 class Routing {
 public:
@@ -39,8 +40,9 @@ public:
 
     Routing(std::chrono::zoned_time<std::chrono::seconds> time);//konstruktor ktory bedzie zmieniac parametry wyzej?
     //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
-    std::vector<std::pair<Node, NodeTimeInfo>> output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
-
+    route_data output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    route_data output_testing(const std::string &start, const std::string &target,
+                    std::chrono::zoned_time<std::chrono::seconds> time);
 
 private:
     std::filesystem::path csv_path_ = WALKING_CSV_PATH;
@@ -56,7 +58,7 @@ private:
     std::vector<NodeTransport> walking_between_stops( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
     std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::optional<std::pair<std::chrono::zoned_time<std::chrono::seconds>, std::string>>  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::vector<std::pair<Routing::Node, Routing::NodeTimeInfo>>  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
     std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time, std::string ending_line);
 

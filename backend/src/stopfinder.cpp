@@ -54,9 +54,9 @@ void StopFinder::generate_map() {
   connection_.emplace(Config::connection_string);
   pqxx::work transaction{*connection_};
   for (const auto &[stopid, lan, lon] :
-       transaction.query<std::string, float, float>(filled_query)) {
+       transaction.query<std::string, double, double>(filled_query)) {
     StopData sd(stopid, lan, lon);
-    coordinates_[stopid] = {static_cast<float>(sd.x), static_cast<float>(sd.y)};
+    coordinates_[stopid] = {(sd.x), (sd.y)};
     ks.tree_vec_.push_back(sd);
   }
   transaction.commit();
@@ -67,7 +67,7 @@ void StopFinder::generate_map() {
 //inilisaized in the constructor and then you will just clena it? will that be
 //faster or sis cleaning slow (im guessing its faster but later check it)
 //=====================
-std::vector<std::pair<std::string, float>>
+std::vector<std::pair<std::string, double>>
 StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   //std::cout << "we are isnide find stop ids, size: "<< coordinates_.size() << '\n';
   auto test = coordinates_.begin();
@@ -78,14 +78,14 @@ StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
     return {};
   //std::cout << "we found the trip" << '\n';
   auto [x, y] = it->second;
-  float points[2] = {x, y};
+  double points[2] = {x, y};
   std::vector<size_t> out_indices(number_of_stops);
-  std::vector<float> out_dist_sq(number_of_stops);
+  std::vector<double> out_dist_sq(number_of_stops);
 
   wrapper_tree_.knnSearch(points, number_of_stops, out_indices.data(),
                           out_dist_sq.data());
 
-  std::vector<std::pair<std::string, float>> closest;
+  std::vector<std::pair<std::string, double>> closest;
   closest.reserve(number_of_stops);
 
   for (size_t i = 1; i < out_indices.size(); ++i) {
@@ -93,4 +93,11 @@ StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
                                      sqrt(out_dist_sq[i]));
   }
   return closest;
+}
+
+std::pair<double, double> StopFinder::get_coords(const std::string& busstop) const{
+  if (auto it = coordinates_.find(busstop); it != coordinates_.end()) {
+    return it->second;
+  }
+  return {0.0, 0.0};//fallback (if its needed check the db)
 }

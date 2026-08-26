@@ -27,6 +27,7 @@ void Translator::generate_lines() {
        }
     line_["walk"] = "walk";
     line_["start"] = "start";
+    line_["walk - safety net"] = "walk";
     transaction.commit();
 }
 
