@@ -5,6 +5,23 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
+
+FetchContent_Declare(
+        asio
+        GIT_REPOSITORY https://github.com/chriskohlhoff/asio
+        GIT_TAG asio-1-38-2
+)
+
+FetchContent_MakeAvailable(asio)
+
+set(ASIO_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include" CACHE PATH "Path to Asio")
+
+FetchContent_Declare(
+        crow
+        GIT_REPOSITORY https://github.com/crowcpp/crow
+        GIT_TAG v1.3.3
+)
+
 FetchContent_Declare(
         libpqxx
         GIT_REPOSITORY https://github.com/jtv/libpqxx
@@ -25,7 +42,7 @@ FetchContent_Declare(
 set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(libpqxx json nanoflann)
+FetchContent_MakeAvailable(libpqxx json nanoflann crow)
 
 add_executable(backend
         src/transporttable.cpp
@@ -33,12 +50,12 @@ add_executable(backend
         src/routing.cpp
         src/stopfinder.cpp
         src/translator.cpp
-
+        src/api.cpp
 )
 
 target_include_directories(backend PRIVATE include)
 
-target_link_libraries(backend PRIVATE pqxx nlohmann_json::nlohmann_json nanoflann::nanoflann)
+target_link_libraries(backend PRIVATE pqxx nlohmann_json::nlohmann_json nanoflann::nanoflann Crow::Crow)
 
 set_target_properties(backend PROPERTIES
         CXX_STANDARD 20
