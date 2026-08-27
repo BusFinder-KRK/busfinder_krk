@@ -34,8 +34,8 @@ public:
 
     struct NodeTransport {
         std::string line_id; //can i get rid of this one here?
-        std::chrono::zoned_time<std::chrono::seconds> departure;
-        std::chrono::zoned_time<std::chrono::seconds> arrival;
+        std::chrono::zoned_time<std::chrono::seconds> departure; //15:00:00
+        std::chrono::zoned_time<std::chrono::seconds> arrival; // 15:03:00
     };
 
     Routing(std::chrono::zoned_time<std::chrono::seconds> time);//konstruktor ktory bedzie zmieniac parametry wyzej?

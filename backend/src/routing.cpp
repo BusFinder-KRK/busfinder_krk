@@ -335,7 +335,7 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
     std::cout << "normal dijkstra" << '\n';
     std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> ans;
     for (const auto &node: help) {
-        std::cout << node.line_id<< " " << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].first.real_time) << '\n';
+        std::cout << node.line_id<< " " << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].first.real_time) << " " <<std::format("{:%T}", record_of_distances[node].second.arrival) <<" " <<std::format("{:%T}", record_of_distances[node].second.departure) << '\n';
         ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;
@@ -475,43 +475,32 @@ route_data Routing::output(const std::string &start, const std::string &target,
     route_data endgame;
     std::vector<route_data::route_data_node> endgame_vec;
 
-    std::cout << "the info" << translator_.get_human_line(vec[1].first.line_id) <<"\n";
-    if (vec.size() > 1 && translator_.get_human_line(vec[1].first.line_id)== "walk") {
-        vec[0].first.line_id = "walk";
-        std::cout << "change!" << '\n';
-    }
-    std::string prev = "";
-    std::string after = vec.size() >=2 ?  translator_.get_human_line(vec[1].first.line_id): "";
-    std::cout << "SIZE!!!" <<vec.size() << '\n';
-    for (int i =0; i < vec.size(); i++) {
-        std::cout << "STOPS:  " << prev << " " << translator_.get_human_line(vec[i].first.line_id)<< " " << after << '\n';
-        const auto& [node, nt] = vec[i];
-        const auto&[ntime, ntrans] = nt;
-        if (prev != translator_.get_human_line(node.line_id)) {
-            std::cout << "GET ON" << '\n';
-            endgame_vec.emplace_back(
-            node.stop_name,
-            sf_.get_coords(node.stop_name),
-            translator_.get_human_stop_name(node.stop_name),
-            "GET_ON",
-            translator_.get_human_line(node.line_id),
-            std::format("{:%T}", ntrans.departure)
-            );
+    int i =1;
+    while (i < vec.size()) {
+        int start =i-1;
+        std::string line = vec[i].first.line_id;
+        while (i < vec.size() && vec[i].first.line_id == line) {
+            i++;
         }
-        if (after != translator_.get_human_line(node.line_id)) {
-            std::cout << "GET OFF" << '\n';
-            endgame_vec.emplace_back(
-            node.stop_name,
-            sf_.get_coords(node.stop_name),
-            translator_.get_human_stop_name(node.stop_name),
-            "GET_OFF",
-            translator_.get_human_line(node.line_id),
-            std::format("{:%T}", ntrans.arrival)
-            );
-        }
-        std::cout << "========" << '\n';
-        prev = translator_.get_human_line(node.line_id);
-        after = i+2 < vec.size() ? translator_.get_human_line(vec[i+2].first.line_id ): "";
+        int end = i-1;
+        std::cout << "from " << start << " to end " << i << '\n';
+
+        endgame_vec.emplace_back(
+        vec[start].first.stop_name,
+        sf_.get_coords(vec[start].first.stop_name),
+        translator_.get_human_stop_name(vec[start].first.stop_name),
+        "GET_ON",
+        translator_.get_human_line(line),
+        std::format("{:%T}", vec[start+1].second.second.departure)
+        );
+        endgame_vec.emplace_back(
+        vec[end].first.stop_name,
+        sf_.get_coords(vec[end].first.stop_name),
+        translator_.get_human_stop_name(vec[end].first.stop_name),
+        "GET_OFF",
+        translator_.get_human_line(line),
+        std::format("{:%T}", vec[end].second.second.arrival)
+        );
     }
 
     std::cout << " FOR TESTING:" << '\n';
