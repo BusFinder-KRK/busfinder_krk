@@ -48,8 +48,7 @@ public:
 
   StopFinder(const int &num);
   void generate_map();
-  std::pair<double, double> get_coords(const std::string& busstop) const;
-
+  std::pair<double, double> get_coords(const std::string &busstop) const;
 
   // metohod to get you the closest n number of stops based on a stop name
   // returns paif - stop ID and distance between the stops

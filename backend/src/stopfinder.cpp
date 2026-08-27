@@ -15,15 +15,15 @@
 //- when so it's the fastest? // -are we sure wee need it? (proabbly for
 //theasfty so yeah)
 //=====================
-StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) {
+StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) { // p1 - latitude, p2 - longitude
   p1 *= M_PI / 180.0;
   p2 *= M_PI / 180.0;
-  constexpr double ref_meridian = 0.366519;
-  constexpr double E0 = 500;
+  constexpr double ref_meridian = 0.331612557;
+  constexpr double E0 = 500000.0;
   constexpr double k0 = 0.9996;
   constexpr double N0 = 0;
 
-  constexpr double a = 6378.137;
+  constexpr double a = 6378137.0;
   constexpr double f = 0.00335281066474781;
   constexpr double n = f/(2 - f);
 
@@ -82,13 +82,13 @@ StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   std::vector<size_t> out_indices(number_of_stops);
   std::vector<double> out_dist_sq(number_of_stops);
 
-  wrapper_tree_.knnSearch(points, number_of_stops, out_indices.data(),
+  const size_t n_of_valid_stops = wrapper_tree_.knnSearch(points, number_of_stops, out_indices.data(),
                           out_dist_sq.data());
 
   std::vector<std::pair<std::string, double>> closest;
   closest.reserve(number_of_stops);
 
-  for (size_t i = 1; i < out_indices.size(); ++i) {
+  for (size_t i = 1; i < n_of_valid_stops; ++i) {
     closest.emplace_back(ks.tree_vec_[out_indices[i]].stop_id,
                                      sqrt(out_dist_sq[i]));
   }
