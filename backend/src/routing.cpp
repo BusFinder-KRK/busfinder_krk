@@ -475,14 +475,19 @@ route_data Routing::output(const std::string &start, const std::string &target,
     route_data endgame;
     std::vector<route_data::route_data_node> endgame_vec;
 
+    std::cout << "the info" << translator_.get_human_line(vec[1].first.line_id) <<"\n";
+    if (vec.size() > 1 && translator_.get_human_line(vec[1].first.line_id)== "walk") {
+        vec[0].first.line_id = "walk";
+        std::cout << "change!" << '\n';
+    }
     std::string prev = "";
-    std::string after = vec.size() >=2 ? vec[1].first.line_id : "";
+    std::string after = vec.size() >=2 ?  translator_.get_human_line(vec[1].first.line_id): "";
     std::cout << "SIZE!!!" <<vec.size() << '\n';
     for (int i =0; i < vec.size(); i++) {
-        std::cout << "STOPS:  " << prev << " " << vec[i].first.line_id << " " << after << '\n';
+        std::cout << "STOPS:  " << prev << " " << translator_.get_human_line(vec[i].first.line_id)<< " " << after << '\n';
         const auto& [node, nt] = vec[i];
         const auto&[ntime, ntrans] = nt;
-        if (prev != node.line_id && (prev != "start" &&  node.line_id != "walk")) {
+        if (prev != translator_.get_human_line(node.line_id)) {
             std::cout << "GET ON" << '\n';
             endgame_vec.emplace_back(
             node.stop_name,
@@ -493,7 +498,7 @@ route_data Routing::output(const std::string &start, const std::string &target,
             std::format("{:%T}", ntrans.departure)
             );
         }
-        if (after != node.line_id) {
+        if (after != translator_.get_human_line(node.line_id)) {
             std::cout << "GET OFF" << '\n';
             endgame_vec.emplace_back(
             node.stop_name,
@@ -505,8 +510,8 @@ route_data Routing::output(const std::string &start, const std::string &target,
             );
         }
         std::cout << "========" << '\n';
-        prev = node.line_id;
-        after = i+2 < vec.size() ? vec[i+2].first.line_id : "";
+        prev = translator_.get_human_line(node.line_id);
+        after = i+2 < vec.size() ? translator_.get_human_line(vec[i+2].first.line_id ): "";
     }
 
     std::cout << " FOR TESTING:" << '\n';
