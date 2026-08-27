@@ -16,7 +16,7 @@ int main() {
             std::chrono::system_clock::now())
     };
     Routing rout(t);
-    rout.output(sloneczna, filharmonia, t);
+    rout.output(sloneczna, biprostal, t);
     std::cout << "the end." << '\n';
     auto end = std::chrono::system_clock::now();
     auto durr = end - start;

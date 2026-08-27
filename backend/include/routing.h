@@ -15,7 +15,7 @@ class Routing {
 public:
     const int search_window{30};
     const double time_for_change{0.5};
-    const int walking_multiplier{1};
+    const double walking_multiplier{1.01};
     const int walking_pace{60};
     const int adjacent_stops{30};
 
