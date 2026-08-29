@@ -43,13 +43,10 @@ void Routing::load_walking_csv() {
     std::string line;
     std::stringstream ss;
     std::string stop1, stop2;
-    float time_min;
+    double time_min;
 
     while (file >> stop1 >> stop2 >> time_min) {
-        //LATER CHANGE THIS SO its a pair and not one string
-        std::string key = stop1 + "," + stop2;
-        int time_minutes = static_cast<int>(std::round(time_min));
-        walking_times_[key] = time_minutes;
+        walking_times_[std::make_pair(stop1, stop2)] = time_min;
     }
 }
 
@@ -128,36 +125,28 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops_reverse(
     return result;
 }
 
-//==================================================
-// TO DO WITH WALKING (when i will want to maximize for spped:
-// do not allocate with vector but just return std::optional<NodeTransport> !
-// do not concate the string - just either change the json or just change the
-// approach when loading into RAM? not sure about this tho? use std pair string
-// string as key in map maybe refactor this code into one bit so i dont have to
-// repeat myslef?
-//==================================================
 std::vector<Routing::NodeTransport> Routing::walking_between_stops(
     const std::string &stop_id1, const std::string &stop_id2,
     std::chrono::zoned_time<std::chrono::seconds> time) {
     auto local_timepoint = time.get_local_time();
     std::vector<Routing::NodeTransport> vec;
-    std::string str1 = stop_id1 + "," + stop_id2;
 
-    if (auto it = walking_times_.find(str1); it != walking_times_.end()) {
+    if (auto it = walking_times_.find(std::make_pair(stop_id1, stop_id2)); it != walking_times_.end()) {
+        auto walk_duration = std::chrono::ceil<std::chrono::minutes>(std::chrono::duration<double, std::ratio<60>>(it->second));
         std::chrono::zoned_time<std::chrono::seconds> t2{
             time.get_time_zone(),
-            local_timepoint + std::chrono::minutes(it->second)
+            local_timepoint + walk_duration
         };
         NodeTransport nt{"walk", time, t2};
         vec.push_back(nt);
         return vec;
     }
 
-    std::string str2 = stop_id2 + "," + stop_id1;
-    if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
+    if (auto it = walking_times_.find(std::make_pair(stop_id2, stop_id1)); it != walking_times_.end()) {
+        auto walk_duration = std::chrono::ceil<std::chrono::minutes>(std::chrono::duration<double, std::ratio<60>>(it->second));
         std::chrono::zoned_time<std::chrono::seconds> t2{
             time.get_time_zone(),
-            local_timepoint + std::chrono::minutes(it->second)
+            local_timepoint + walk_duration
         };
         NodeTransport nt{"walk", time, t2};
         vec.push_back(nt);
@@ -171,23 +160,23 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
     std::chrono::zoned_time<std::chrono::seconds> time) {
     auto local_timepoint = time.get_local_time();
     std::vector<Routing::NodeTransport> vec;
-    std::string str1 = stop_id1 + "," + stop_id2;
 
-    if (auto it = walking_times_.find(str1); it != walking_times_.end()) {
+    if (auto it = walking_times_.find(std::make_pair(stop_id1, stop_id2)); it != walking_times_.end()) {
+        auto walk_duration = std::chrono::ceil<std::chrono::minutes>(std::chrono::duration<double, std::ratio<60>>(it->second));
         std::chrono::zoned_time<std::chrono::seconds> t1{
             time.get_time_zone(),
-            local_timepoint - std::chrono::minutes(it->second)
+            local_timepoint - walk_duration
         };
         NodeTransport nt{"walk", time, t1};
         vec.push_back(nt);
         return vec;
     }
 
-    std::string str2 = stop_id2 + "," + stop_id1;
-    if (auto it = walking_times_.find(str2); it != walking_times_.end()) {
+    if (auto it = walking_times_.find(std::make_pair(stop_id2, stop_id1)); it != walking_times_.end()) {
+        auto walk_duration = std::chrono::ceil<std::chrono::minutes>(std::chrono::duration<double, std::ratio<60>>(it->second));
         std::chrono::zoned_time<std::chrono::seconds> t1{
             time.get_time_zone(),
-            local_timepoint - std::chrono::minutes(it->second)
+            local_timepoint - walk_duration
         };
         NodeTransport nt{"walk", time, t1};
         vec.push_back(nt);

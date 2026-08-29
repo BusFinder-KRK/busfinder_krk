@@ -1,29 +1,20 @@
 NOTES:
 
 GENERAL============
--think if we should add line_id to NodeTimeInfo
--should the path to csv be hardcoded?
+
 =====================
 
 STOPFINDER.CPP===============
-- !! the convertion - I'm currently keeping it in degrees, but i want to change it to meteres - questions:
-        - when so it's the fastest?
-        -are we sure wee need it? (proabbly for the safety net so yeah)
+
 =====================
 
 ROUTING.CPP===============
-- maybe later switch the line ID to be and integer since ints are faster: for exaple instead of doing "walk" do a -1 or sth
-- MAYBE add checking for debuging in load_walking_json
-- jakie dane ma zwraca dijkstra
-- TO DO WITH WALKING (when i will want to maximize for spped:
+- maybe later switch the line ID to be and integer since ints are faster: for exaple instead of doing "walk" do a -1 or sth; you need to make sure that line id for trams is just int
+-should i delete the line_if from transport node?
+
+- TO DO WITH WALKING (when i will want to maximize for speed):
         -do not allocate with vector but just return std::optional<NodeTransport> !
-        -do not concate the string - just either change the json or just change the approach when loading into RAM? not
-        -sure about this tho?
-        -use std pair string string as key in map
-        -maybe refactor this code into one bit so i dont have to repeat myslef?
-- !!! TO DO WITH output method:
-         - what with arrival time??
-         - how to format this thing?
+        - in the walking_time.csv - the bigger number is always first so that there is only one hash look up
 =====================
 
 ROUTING.H===============

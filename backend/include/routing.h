@@ -27,7 +27,7 @@ public:
     };
 
     struct NodeTimeInfo {
-        float cost_from_start; //time from start of the journy (change to time type later?)
+        float cost_from_start; //time from start of the journy
         std::chrono::zoned_time<std::chrono::seconds> real_time; // for example 15:49:23
         //in python there was also the line id here again?
     };
@@ -38,7 +38,7 @@ public:
         std::chrono::zoned_time<std::chrono::seconds> arrival; // 15:03:00
     };
 
-    Routing(std::chrono::zoned_time<std::chrono::seconds> time);//konstruktor ktory bedzie zmieniac parametry wyzej?
+    Routing(std::chrono::zoned_time<std::chrono::seconds> time);
     //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
     route_data output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
     route_data output_testing(const std::string &start, const std::string &target,
@@ -46,7 +46,7 @@ public:
 
 private:
     std::filesystem::path csv_path_ = WALKING_CSV_PATH;
-    std::unordered_map<std::string, int> walking_times_;
+    std::unordered_map<std::pair<std::string, std::string>, double, PairHash> walking_times_; //pairhash from transporttable.h
     TransportTable ttable_;
     StopFinder sf_;
     Translator translator_;
