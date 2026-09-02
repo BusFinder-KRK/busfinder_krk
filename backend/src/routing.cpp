@@ -235,6 +235,25 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
         float time_to_arrive;
         float add_cost;
 
+        //lambda for edge relaxing
+        auto relax_edge = [&](const std::string& new_stop, const NodeTransport& nodetrans, float add_cost) {
+            Node n{new_stop, nodetrans.line_id};
+            auto it = record_of_distances.find(n);
+
+            if (it == record_of_distances.end()) {
+                NodeTimeInfo nt{old_cost + add_cost, nodetrans.arrival};
+                record_of_distances[n] = std::make_pair(nt, nodetrans);
+                pq.emplace(old_cost + add_cost, n);
+                prev[n] = old_node;
+            }
+            else if (it->second.first.cost_from_start > old_cost + add_cost) {
+                NodeTimeInfo nt{old_cost + add_cost, nodetrans.arrival};
+                it->second = std::make_pair(nt, nodetrans);
+                pq.emplace(old_cost + add_cost, n);
+                prev[n] = old_node;
+            }
+        };
+
         for (const auto &[new_stop, distance]:
              sf_.find_stop_ids(old_node.stop_name)) {
             if (new_stop != old_node.stop_name) {
@@ -254,21 +273,7 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
 
                         if (is_old_node_not_walk && old_node.line_id != nodetrans.line_id) add_cost += this->time_for_change;
 
-                        Node n{new_stop, nodetrans.line_id};
-                        auto it = record_of_distances.find(n);
-
-                        if (it == record_of_distances.end()) {
-                            NodeTimeInfo nt{old_cost + add_cost, nodetrans.arrival};
-                            record_of_distances[n] = std::make_pair(nt, nodetrans);
-                            pq.emplace(old_cost + add_cost, n);
-                            prev[n] = old_node;
-                        }
-                        else if (it->second.first.cost_from_start > old_cost + add_cost) {
-                            NodeTimeInfo nt{old_cost + add_cost, nodetrans.arrival};
-                            it->second = std::make_pair(nt, nodetrans);
-                            pq.emplace(old_cost + add_cost, n);
-                            prev[n] = old_node;
-                        }
+                        relax_edge(new_stop, nodetrans, add_cost);
                     }
                     continue;
                 }
@@ -284,55 +289,24 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
                     add_cost = time_to_arrive;
                     add_cost *= walking_multiplier;
 
-                    Node n{new_stop, nodetrans->line_id};
-
-                    auto it = record_of_distances.find(n);
-
-                    if (it == record_of_distances.end()) {
-                        NodeTimeInfo nt{old_cost + add_cost, nodetrans->arrival};
-                        record_of_distances[n] = std::make_pair(nt, *nodetrans);
-                        pq.emplace(old_cost + add_cost, n);
-                        prev[n] = old_node;
-                    }
-                    else if (it->second.first.cost_from_start > old_cost + add_cost) {
-                        NodeTimeInfo nt{old_cost + add_cost, nodetrans->arrival};
-                        it->second = std::make_pair(nt, *nodetrans);
-                        pq.emplace(old_cost + add_cost, n);
-                        prev[n] = old_node;
-                    }
+                    relax_edge(new_stop, *nodetrans, add_cost);
                     continue;
                 }
                 //IF WALKING - SAFTY NODE:
                 time_to_arrive = std::ceil(distance / this->walking_pace);
                 add_cost = time_to_arrive * 5; // huge punishemnd so the algo is scared of
-                // this option, counted in minutes
                 std::string line_id = "walk - safety net";
                 std::chrono::zoned_time<std::chrono::seconds> arrival_at_B{
                     time.get_time_zone(),
                     record_of_distances[old_node].first.real_time.get_sys_time() +
                     std::chrono::minutes(static_cast<int>(time_to_arrive))
+                    };
 
-        };
                 NodeTransport safe_nt{
                     line_id, record_of_distances[old_node].first.real_time,
                     arrival_at_B
                 };
-                Node n{new_stop, safe_nt.line_id};
-
-                auto it = record_of_distances.find(n);
-
-                if (it == record_of_distances.end()) {
-                    NodeTimeInfo nt{old_cost + add_cost, safe_nt.arrival};
-                    record_of_distances[n] = std::make_pair(nt, safe_nt);
-                    pq.emplace(old_cost + add_cost, n);
-                    prev[n] = old_node;
-                }
-                else if (it->second.first.cost_from_start > old_cost + add_cost) {
-                    NodeTimeInfo nt{old_cost + add_cost, safe_nt.arrival};
-                    it->second = std::make_pair(nt, safe_nt);
-                    pq.emplace(old_cost + add_cost, n);
-                    prev[n] = old_node;
-                }
+                relax_edge(new_stop, safe_nt, add_cost);
             }
         }
     }

@@ -13,7 +13,6 @@ ROUTING.CPP===============
 -should i delete the line_if from transport node?
 
 - TO DO WITH WALKING (when i will want to maximize for speed):
-        -do not allocate with vector but just return std::optional<NodeTransport> !
         - in the walking_time.csv - the bigger number is always first so that there is only one hash look up
 =====================
 
