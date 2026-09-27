@@ -53,16 +53,14 @@ void Routing::load_walking_csv() {
 std::vector<Routing::NodeTransport> Routing::transport_between_stops(
     const std::string &stop_id1, const std::string &stop_id2,
     std::chrono::zoned_time<std::chrono::seconds> time) {
-
     auto local_timepoint = time.get_local_time();
     std::vector<Routing::NodeTransport> result;
     std::string houradmin = std::format("{:%H:%M}", local_timepoint);
-
     auto midnight = std::chrono::floor<std::chrono::days>(local_timepoint);
 
     auto it = ttable_.table_.find({stop_id1, stop_id2});
     if (it == ttable_.table_.end()) {
-        return result;
+        return result; //to optimize we can return nothing and not initialize the vector!!
     }
     const auto &possible_trips = it->second;
     for (const auto &option: possible_trips) {
@@ -88,20 +86,21 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops(
     return result;
 }
 
+//STOP1 - sloneczna(1 normal) STOP2 - bialy(2 noraml)
 std::vector<Routing::NodeTransport> Routing::transport_between_stops_reverse(
     const std::string &stop_id1, const std::string &stop_id2,
     std::chrono::zoned_time<std::chrono::seconds> time) {
+    //time now is the latest time we have to be at stop2 (and not the time we are at the stop1 like in normal transport)
     auto local_timepoint = time.get_local_time();
     std::vector<NodeTransport> result;
     std::string houradmin = std::format("{:%H:%M}", local_timepoint);
     auto midnight = std::chrono::floor<std::chrono::days>(local_timepoint);
 
-    auto it = ttable_.table_.find({stop_id2, stop_id1});
+    auto it = ttable_.table_.find({stop_id1, stop_id2});
     if (it == ttable_.table_.end()) {
         return result;
     }
     const auto &possible_trips = it->second;
-
     for (const auto &option: std::views::reverse(possible_trips)) {
         if (option.time_stop2 <= houradmin) {
             int h = std::stoi(option.time_stop1.substr(0, 2));
@@ -152,11 +151,12 @@ std::optional<Routing::NodeTransport> Routing::walking_between_stops(
     return std::nullopt;
 }
 
+//fix so its optional
 std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
     const std::string &stop_id1, const std::string &stop_id2,
     std::chrono::zoned_time<std::chrono::seconds> time) {
     auto local_timepoint = time.get_local_time();
-    std::vector<Routing::NodeTransport> vec;
+    std::vector<NodeTransport> vec;
 
     if (auto it = walking_times_.find(std::make_pair(stop_id1, stop_id2)); it != walking_times_.end()) {
         auto walk_duration = std::chrono::ceil<std::chrono::minutes>(std::chrono::duration<double, std::ratio<60>>(it->second));
@@ -164,7 +164,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
             time.get_time_zone(),
             local_timepoint - walk_duration
         };
-        NodeTransport nt{"walk", time, t1};
+        NodeTransport nt{"walk", t1, time}; //bc departure is always < arrival
         vec.push_back(nt);
         return vec;
     }
@@ -175,7 +175,7 @@ std::vector<Routing::NodeTransport> Routing::walking_between_stops_reverse(
             time.get_time_zone(),
             local_timepoint - walk_duration
         };
-        NodeTransport nt{"walk", time, t1};
+        NodeTransport nt{"walk", t1, time};
         vec.push_back(nt);
         return vec;
     }
@@ -386,8 +386,8 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
             if (new_stop != old_node.stop_name) {
                 //IF TRANSPORT:
                 std::vector<NodeTransport> result =
-                        transport_between_stops(old_node.stop_name, new_stop,
-                                                record_of_distances[old_node].first.real_time);
+                        transport_between_stops(new_stop,old_node.stop_name,
+                                                record_of_distances[old_node].first.real_time); //are we sure the real time is good? maybe change for nt
                 if (!result.empty()) {
                     for (const auto &nodetrans: result) {
                         auto delta =  nodetrans.arrival.get_local_time() - record_of_distances[old_node].first.real_time.get_local_time();
@@ -400,15 +400,16 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
 
                         if (is_old_node_not_walk && old_node.line_id != nodetrans.line_id) add_cost += this->time_for_change;
 
-                        relax_edge(new_stop, nodetrans, add_cost);
+                        relax_edge(new_stop, nodetrans, add_cost); //check if i should change the RELAX ENDGE
                     }
                     continue;
                 }
                 //IF WALK
                 const auto& nodetrans =
-                            walking_between_stops(old_node.stop_name, new_stop,
+                            walking_between_stops_reverse(new_stop,old_node.stop_name,
                                                   record_of_distances[old_node].first.real_time);
                 if (nodetrans.has_value()) {
+                    ///COME BACK TO THIS!!!
                     auto delta =  nodetrans->arrival.get_local_time() - record_of_distances[old_node].first.real_time.get_local_time();
                     auto total_seconds =
                             std::chrono::duration_cast<std::chrono::seconds>(delta).count();

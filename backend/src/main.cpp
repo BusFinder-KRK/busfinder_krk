@@ -3,8 +3,6 @@
 #include <api.h>
 
 int main() {
-  // api API;
-  // API.run();
 
   auto start = std::chrono::system_clock::now();
   std::cout << "starting\n";
@@ -19,7 +17,9 @@ int main() {
       std::chrono::time_point_cast<std::chrono::seconds>(
           std::chrono::system_clock::now())};
   Routing rout(t);
-  rout.output(sloneczna, biprostal, t);
+  //  api API;
+  //  API.run();
+    rout.output(sloneczna, biprostal, t);
   std::cout << "the end." << '\n';
   auto end = std::chrono::system_clock::now();
   auto durr = end - start;

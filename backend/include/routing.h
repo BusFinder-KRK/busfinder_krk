@@ -18,6 +18,7 @@ public:
     const double walking_multiplier{1.01};
     const int walking_pace{60};
     const int adjacent_stops{30};
+    Translator translator_;
 
     struct Node {
         std::string stop_name; // for example "Kapelanka07"
@@ -49,7 +50,6 @@ private:
     std::unordered_map<std::pair<std::string, std::string>, double, PairHash> walking_times_; //pairhash from transporttable.h
     TransportTable ttable_;
     StopFinder sf_;
-    Translator translator_;
 
     void load_walking_csv();
 
