@@ -65,7 +65,7 @@ private:
     std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
     std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time, std::string ending_line);
-
+    std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> dijkstra_new_reversed( const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 };
 
 #endif // BUSFINDER_BACKEND_ROUTER_H
