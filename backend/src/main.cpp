@@ -20,7 +20,7 @@ int main() {
   Routing rout(t);
   //  api API;
   //  API.run();
-    rout.output(sloneczna, kleparz04, t);
+    rout.output(sloneczna, friedleina, t);
   std::cout << "the end." << '\n';
   auto end = std::chrono::system_clock::now();
   auto durr = end - start;

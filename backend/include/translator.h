@@ -8,7 +8,9 @@ inline std::string test_query1 = R"(
                 SELECT stop_id, stop_name, stop_desc FROM stops
                 )";
 inline std::string test_query2 = R"(
-                SELECT trip_id, route_id FROM trips
+                SELECT DISTINCT t.trip_id, r.route_long_name
+                FROM trips t
+                JOIN routes r ON t.route_id = r.route_id;
                 )";
 
 class Translator {
