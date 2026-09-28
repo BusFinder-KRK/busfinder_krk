@@ -17,7 +17,7 @@ public:
     const double time_for_change{0.5};
     const double walking_multiplier{1.01};
     const int walking_pace{60};
-    const int adjacent_stops{30};
+    const int adjacent_stops{40};
     Translator translator_;
 
     struct Node {
@@ -60,7 +60,7 @@ private:
     const std::string &stop_id1, const std::string &stop_id2,
     std::chrono::zoned_time<std::chrono::seconds> time);
 
-    std::vector<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
+    std::optional<NodeTransport> walking_between_stops_reverse( const std::string& stop_id1, const std::string& stop_id2, std::chrono::zoned_time<std::chrono::seconds> time);
 
     std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
 
