@@ -2,7 +2,8 @@
 #define BUSFINDER_BACKEND_API_H
 
 #include <crow.h>
-#include <route_data.h>
+#include "route_data.h"
+#include "translator.h"
 
 class api {
 public:
@@ -14,6 +15,7 @@ private:
   /// utilities
   static crow::json::wvalue make_default_response(const route_data&);
   static std::chrono::zoned_time<std::chrono::seconds> parse_time(const std::string& time_str);
+  static Translator;
 };
 
 #endif // BUSFINDER_BACKEND_API_H

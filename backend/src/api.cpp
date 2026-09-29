@@ -20,7 +20,7 @@ api::api() {
 
     auto parsed_time = parse_time(datetime);
     Routing r(parsed_time);
-    const route_data route = r.output(stopid1, stopid2, parsed_time);
+    const RouteData route = r.output(stopid1, stopid2, parsed_time);
     return crow::response(make_default_response(route));
   });
 
@@ -48,6 +48,11 @@ api::api() {
     // Routing r(parsed_time);
     // const route_data route = r.output(stopid1, stopid2, parsed_time);
     return crow::response();
+  });
+
+  CROW_ROUTE(app_, "/stops")
+  ([](){
+
   });
 }
 
