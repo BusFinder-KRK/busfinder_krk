@@ -40,7 +40,7 @@ busfinder_krk/
     └── CMakeLists.txt
 ```
 ## Dependencies
-- C++23 compliant compiler
+- C++20 compliant compiler
 - CMake 3.20+
 - PostgreSQL 15+
 - Python 3 (`requests`, `psycopg`), Bash, `cron`
