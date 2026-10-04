@@ -1,6 +1,6 @@
 # BusFinder KRK
 
-![C++23](https://img.shields.io/badge/C%2B%2B-23-00599C?style=flat&logo=cplusplus&logoColor=white)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?style=flat&logo=cplusplus&logoColor=white)
 ![CMake](https://img.shields.io/badge/CMake-3.20+-064F8C?style=flat&logo=cmake&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-4169E1?style=flat&logo=postgresql&logoColor=white)
 
