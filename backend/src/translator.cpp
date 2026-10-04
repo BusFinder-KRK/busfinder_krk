@@ -14,7 +14,7 @@ void Translator::generate_names() {
     pqxx::work transaction{*connection_};
     for (const auto &[stopid, name, num] :
        transaction.query<std::string, std::string, std::string>(test_query1)) {
-        stop_name_[stopid] = name+num;
+        stop_name_[stopid] = name + " " + num;
        }
     transaction.commit();
 }

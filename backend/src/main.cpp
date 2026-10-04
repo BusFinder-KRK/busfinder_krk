@@ -3,8 +3,8 @@
 #include <api.h>
 
 int main() {
-  // api API;
-  // API.run();
+  api API;
+  API.run();
 //
 //   auto start = std::chrono::system_clock::now();
 //   std::cout << "starting\n";

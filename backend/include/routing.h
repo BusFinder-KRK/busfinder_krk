@@ -41,8 +41,8 @@ public:
 
     Routing(std::chrono::zoned_time<std::chrono::seconds> time);
     //moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
-    route_data output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
-    route_data output_testing(const std::string &start, const std::string &target,
+    RouteData output(const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time);
+    RouteData output_testing(const std::string &start, const std::string &target,
                     std::chrono::zoned_time<std::chrono::seconds> time);
 
 private:

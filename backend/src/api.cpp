@@ -3,6 +3,7 @@
 #include <route_data.h>
 #include <chrono>
 #include <routing.h>
+#include <translator.h>
 
 api::api() {
   CROW_ROUTE(app_, "/route/route_stops")
@@ -52,11 +53,11 @@ api::api() {
 
   CROW_ROUTE(app_, "/stops")
   ([](){
-
+    return crow::response(make_stop_list());
   });
 }
 
-crow::json::wvalue api::make_default_response(const route_data &data) {
+crow::json::wvalue api::make_default_response(const RouteData &data) {
   crow::json::wvalue result;
   result["start_stop"] = data.start_stop;
   result["end_stop"] = data.end_stop;
@@ -88,6 +89,21 @@ api::parse_time(const std::string &time_str) {
 
   ss >> std::chrono::parse("%Y-%m-%d %H:%M:%S", parsed_local);
   return std::chrono::zoned_time{"Europe/Warsaw", parsed_local};
+}
+
+crow::json::wvalue api::make_stop_list() {
+  Translator stop_list_generator{};
+  crow::json::wvalue result;
+  std::vector<crow::json::wvalue> stop_list;
+  stop_list.reserve(stop_list_generator.stop_name_.size());
+  for (const auto& [id, name] : stop_list_generator.stop_name_) {
+    crow::json::wvalue entry;
+    entry["id"] = id;
+    entry["name"] = name;
+    stop_list.push_back(entry);
+  }
+  result["stoplist"] = std::move(stop_list);
+  return result;
 }
 
 void api::run() { app_.port(18080).multithreaded().run(); }
