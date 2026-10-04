@@ -1,0 +1,10 @@
+body{
+    margin: 0;
+    background-color: #060839;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgb(41, 4, 48), transparent 150%);
+}
+
+*, *:before, *:after{
+    box-sizing: border-box;
+}

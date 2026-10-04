@@ -1,0 +1,20 @@
+.ftr{
+    bottom: 0;
+    position: sticky;
+    display: flex;
+    /* background: 
+        linear-gradient(
+            to right, 
+            #0f1038 0%,
+            rgb(0, 0, 0) 50%,
+            #10124d 100%
+        );
+    */
+    background: rgb(0, 0, 0, 0.2);
+    z-index: 10;
+    border-top: 1px solid rgba(195, 226, 255, 0.484);
+    padding: 0.5vh;
+    font-size: 0.9em;
+    color: rgba(195, 226, 255, 0.484);
+    height: max(20px, 4.5vh);
+}

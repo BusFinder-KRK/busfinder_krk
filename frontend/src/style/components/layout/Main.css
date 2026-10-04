@@ -1,0 +1,17 @@
+.main{
+    min-height: 100vh;
+    min-width: 100vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.route-search{
+    position: fixed;
+    left: 6vw;
+    top: 8vh;
+    display: flex;
+    align-items: stretch;
+    width: min(90vw, 450px);
+    flex-direction: column;
+    gap: 12vh;
+}

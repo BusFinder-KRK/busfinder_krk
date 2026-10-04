@@ -1,0 +1,46 @@
+.result{
+    display: flex;
+    flex-direction: column;
+
+    color: rgb(195, 226, 255);
+    border: 1px solid rgb(195, 226 ,255);
+    border-radius: 8px;
+    background-color: rgb(0 0 0 / 0.15);
+    padding: 15px;
+    font-size: 1em;
+    width: 100%;
+}
+
+.result-header {
+    list-style: none;
+    padding: 10px;
+}
+
+.result ul.result-list {
+    margin-top: 0px;
+}
+
+h3 {
+    display: block;
+    margin-top: 0.8vh;
+    margin-bottom: 0.6vh;
+    padding-bottom: 1vh;
+    font-size: min(3vh, 2vh);
+    text-align: center;
+    color:rgb(255, 143, 31);
+    border-bottom: 1px solid rgb(255, 143, 31);
+}
+
+.result .react-loading-skeleton{
+    display: block;
+    width: 100%;
+}
+
+
+.result.skeleton-wrapper{
+    border: none;
+}
+
+.result.skeleton-wrapper h3{
+    border-bottom: none;
+}
