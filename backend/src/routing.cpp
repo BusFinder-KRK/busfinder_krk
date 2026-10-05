@@ -458,53 +458,51 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
 }
 
 
-route_data Routing::output(const std::string &start, const std::string &target,
+RouteData Routing::output(const std::string &start, const std::string &target,
                 std::chrono::zoned_time<std::chrono::seconds> time) {
     auto vec = dijkstra_dalekowzrocznosc(start, target, time);
     auto arrival_time = vec[vec.size()-1].second.first.real_time;
     auto vec_rev = dijkstra_new_reversed(target, start, arrival_time);
-    route_data endgame;
-    std::vector<route_data::route_data_node> endgame_vec;
-    /*
-    int i =1;
-    while (i < vec.size()) {
-        int start =i-1;
-        std::string line = vec[i].first.line_id;
-        while (i < vec.size() && vec[i].first.line_id == line) {
-            i++;
-        }
-        int end = i-1;
-        std::cout << "from " << start << " to end " << i << '\n';
+    RouteData endgame;
+    std::vector<RouteData::RouteDataNode> endgame_vec;
+      int i =1;
+      while (i < vec.size()) {
+          int start =i-1;
+          std::string line = vec[i].first.line_id;
+          while (i < vec.size() && vec[i].first.line_id == line) {
+              i++;
+          }
+          int end = i-1;
+          // std::cout << "from " << start << " to end " << i << '\n';
 
-        endgame_vec.emplace_back(
-        vec[start].first.stop_name,
-        sf_.get_coords(vec[start].first.stop_name),
-        translator_.get_human_stop_name(vec[start].first.stop_name),
-        "GET_ON",
-        translator_.get_human_line(line),
-        std::format("{:%T}", vec[start+1].second.second.departure)
-        );
-        endgame_vec.emplace_back(
-        vec[end].first.stop_name,
-        sf_.get_coords(vec[end].first.stop_name),
-        translator_.get_human_stop_name(vec[end].first.stop_name),
-        "GET_OFF",
-        translator_.get_human_line(line),
-        std::format("{:%T}", vec[end].second.second.arrival)
-        );
-    }
+          endgame_vec.emplace_back(
+          vec[start].first.stop_name,
+          sf_.get_coords(vec[start].first.stop_name),
+          translator_.get_human_stop_name(vec[start].first.stop_name),
+          "GET_ON",
+          translator_.get_human_line(line),
+          std::format("{:%T}", vec[start+1].second.second.departure)
+          );
+          endgame_vec.emplace_back(
+          vec[end].first.stop_name,
+          sf_.get_coords(vec[end].first.stop_name),
+          translator_.get_human_stop_name(vec[end].first.stop_name),
+          "GET_OFF",
+          translator_.get_human_line(line),
+          std::format("{:%T}", vec[end].second.second.arrival)
+          );
+      }
 
-    std::cout << " FOR TESTING:" << '\n';
+      std::cout << " FOR TESTING:" << '\n';
 
-    for (const auto& rd : endgame_vec) {
-        std::cout << rd.stop_id << " " << rd.stop_coords.first << " " << rd.stop_coords.second<< " " << rd.stop_name << " " << rd.route_name << " " << rd.time << " " << rd.type << '\n';
-    }
+      // for (const auto& rd : endgame_vec) {
+          // std::cout << rd.stop_id << " " << rd.stop_coords.first << " " << rd.stop_coords.second<< " " << rd.stop_name << " " << rd.route_name << " " << rd.time << " " << rd.type << '\n';
+      // }
 
-    endgame.route_proper = endgame_vec;
-    endgame.start_stop = start;
-    endgame.end_stop = target;
-    endgame.start_time = std::format("{:%T}", time);
-    endgame.end_time = std::format("{:%T}", arrival_time);
-    return endgame;
-    */
+      endgame.route_proper = endgame_vec;
+      endgame.start_stop = start;
+      endgame.end_stop = target;
+      endgame.start_time = std::format("{:%T}", time);
+      endgame.end_time = std::format("{:%T}", arrival_time);
+      return endgame;
 }

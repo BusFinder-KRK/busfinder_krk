@@ -1,0 +1,89 @@
+form {
+    position: relative;
+    width: 100%;
+    top: 8vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    grid-area: form;
+}
+
+
+input{
+    display: block;
+    height: 4.5vh;
+    width: 100%;
+    margin: 0.7vh auto;
+    color: rgba(195, 226, 255, 0.903);
+    font-size: max(20px, 1.7vh);
+    text-align: center;
+    /* border: 3px solid rgba(255, 143, 31, 0.64); */
+    border: 3px solid rgba(148, 173, 235, 0.14);
+    background-color: rgb(76 102 166 / 0.2);
+    border-radius: 8px;
+}
+
+.stop-input{
+    width: 80%;
+    position: relative;
+    position: 0 auto;
+}
+
+button{
+    margin-top: 15px;
+    color: rgb(195, 226, 255);
+    height: 5vh;
+    width: 45%;
+    background-color: rgba(152, 77, 165, 0.2);
+    border: 3px solid rgba(152, 77, 165, 0.2);
+    border-radius: 15px;
+    font-size: max(20px, 2.3vh);
+}
+
+button:hover{
+    background-color: rgba(152, 77, 165, 0.6);
+    border: 3px solid rgba(152, 77, 165, 0.6);
+    cursor: pointer;
+
+}
+
+/*
+    Think about adding button:active
+*/
+
+
+.autocomplete-search li{
+    color: rgb(195, 226, 255);
+    padding: 2.5px 0;
+}
+
+.autocomplete-search li:hover{
+    background-color: rgb(195 226 255 / 0.7);
+    color: rgb(13 20 105);
+    cursor: pointer;
+}
+
+ul.autocomplete-search {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 0px 0px 8px 8px;
+    border-top: 1px solid rgba(148, 173, 235, 0.5);
+    margin: -10px auto;
+    padding: 0;
+    left: 10;
+    background:
+        linear-gradient(
+            to right, 
+            #0b0c26 0%,
+            rgb(0, 0, 0) 50%,
+            #0b0c26 100%
+        );
+    width: 100%;
+    list-style: none;
+    max-height: 60vw;
+    position: absolute;
+    z-index: 10;
+    overflow-x: scroll;
+    text-align: center;
+}
