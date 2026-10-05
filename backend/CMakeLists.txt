@@ -29,11 +29,6 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-        json
-        URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-)
-
-FetchContent_Declare(
         nanoflann
         GIT_REPOSITORY https://github.com/jlblancoc/nanoflann.git
         GIT_TAG        v1.6.0
@@ -42,7 +37,7 @@ FetchContent_Declare(
 set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(libpqxx json nanoflann crow)
+FetchContent_MakeAvailable(libpqxx nanoflann crow)
 
 add_executable(backend
         src/transporttable.cpp
@@ -55,7 +50,7 @@ add_executable(backend
 
 target_include_directories(backend PRIVATE include)
 
-target_link_libraries(backend PRIVATE pqxx nlohmann_json::nlohmann_json nanoflann::nanoflann Crow::Crow)
+target_link_libraries(backend PRIVATE pqxx nanoflann::nanoflann Crow::Crow)
 
 set_target_properties(backend PROPERTIES
         CXX_STANDARD 20
