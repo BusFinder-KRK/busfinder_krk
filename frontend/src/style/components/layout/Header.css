@@ -11,6 +11,7 @@ h1 {
     align-items: center;
     justify-content: center;
     display: flex;
+    flex-direction: row;
     height: max(20px, 6.5vh);
     background:
         linear-gradient(

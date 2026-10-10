@@ -1,13 +1,28 @@
-import { useContext } from "react";
-import { useState } from "react"
+import { use, useContext, useEffect, useRef, useState } from "react";
 import StopsContext from "../../context/StopsContext";
 import "../../style/components/Form.css"
 
 function StopInput({ inputType, input, setInput }) {
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
 
     const { stops = [], isLoading } = useContext(StopsContext);
+    const containerRef = useRef(null)
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setIsOpen(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
 
     function handleInput(e) {
         const value = e.target.value;
@@ -27,6 +42,10 @@ function StopInput({ inputType, input, setInput }) {
     }
 
 
+    function handleFocus() {
+        setIsOpen(true)
+    }
+
     function handleSelect(suggestion) {
         setInput(suggestion);
         setQuery(suggestion.name);
@@ -35,7 +54,7 @@ function StopInput({ inputType, input, setInput }) {
 
 
     return (
-        <div className="stop-input">
+        <div className="stop-input" ref={containerRef}>
             <input 
                 type="text" 
                 name={inputType}
@@ -43,9 +62,10 @@ function StopInput({ inputType, input, setInput }) {
                 value={query} 
                 autoComplete="off"
                 onChange={handleInput}
+                onFocus={handleFocus}
                 placeholder={`Input ${inputType} stop`}
             />
-            {suggestions.length > 0 && (
+            {isOpen && suggestions.length > 0 && (
                 <ul className="autocomplete-search">
                     {
                         suggestions.map((item) => (

@@ -9,7 +9,7 @@ function Form({ startInput, endInput, setStartInput, setEndInput, handleSubmit }
         <form name="route-form" onSubmit={handleSubmit} className="route-form">
             <StopInput inputType="start" input={startInput} setInput={setStartInput} />
             <StopInput inputType="end" input={endInput} setInput={setEndInput} />
-            <button >Find route</button>
+            <button className="route-button">Find route</button>
         </form>
     );
 }

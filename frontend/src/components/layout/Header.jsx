@@ -1,4 +1,5 @@
 import "../../style/components/layout/Header.css"
+import InfoButton from "../minor/InfoButton";
 
 export default function Header() {
     return (
@@ -6,6 +7,7 @@ export default function Header() {
             <h1>
                 BusFinder
             </h1>
+            <InfoButton />
         </div>
     );
 }
