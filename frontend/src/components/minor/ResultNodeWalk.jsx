@@ -1,4 +1,4 @@
-export default function({ resultEntry, duration }) {
+export default function ({ resultEntry, duration }) {
     const timeNoun = duration == 1 ? "minute" : "minutes";
     return (
         <li>

@@ -1,13 +1,13 @@
 import "../../style/components/layout/Header.css"
-import InfoButton from "../minor/InfoButton";
+import "../../style/components/Info.css"
 
-export default function Header() {
+export default function Header({ onOpenInfo }) {
     return (
         <div className="hdr">
             <h1>
                 BusFinder
             </h1>
-            <InfoButton />
+            <button onClick={onOpenInfo} className="info-button" />
         </div>
     );
 }

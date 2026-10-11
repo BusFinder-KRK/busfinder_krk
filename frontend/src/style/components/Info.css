@@ -1,0 +1,69 @@
+
+button.info-button {
+    /* positioning rules */
+    position: absolute;
+    right: 10%;
+    /* background rules */
+    background-image: url(../../assets/question.png);
+    height: 80%;
+    aspect-ratio: 1 / 1;
+    background-size: contain;
+    background-color: rgba(5, 0, 7, 0);
+    /* other style */
+    filter: invert(74%) sepia(63%) saturate(3883%) hue-rotate(344deg) brightness(44%) contrast(101%);
+    border-radius: 7px;
+    border: 2px solid #000000fe;
+}
+
+button.info-button:hover{
+    filter: invert(74%) sepia(63%) saturate(3883%) hue-rotate(344deg) brightness(102%) contrast(101%);
+    cursor: pointer;
+}
+
+button.info-button:active{
+    filter: invert(74%) sepia(63%) saturate(3883%) hue-rotate(344deg) brightness(150%) contrast(101%);
+}
+
+div.info-window {
+    position: fixed;
+
+    top: max(30px, 8.5vh);
+    bottom: max(30px, 7vh);
+    right: 5%;
+    left: 5%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: rgb(122, 66, 10); */
+    background-color: #0b0c35;
+    border: 4px solid rgba(255, 143, 31, 0.64);
+
+    overflow: hidden;
+}
+
+.info-window h2 {
+    width: 90%;
+    text-align: center;
+    font-size: max(15px, 3vh);   
+    color: rgb(195, 226, 255);
+    padding-bottom: 1.2vh;
+    border-bottom: 1px solid rgb(195, 226, 255);
+    /* color: rgb(24, 4, 58); */
+}
+
+button.exit-button {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+
+    height: 3%;
+    aspect-ratio: 1 / 1;
+
+    background-image: url(../../assets/exit.png);
+    background-size: contain;
+    background-color: black;
+    border: 1px solid rgb(255, 143, 31);
+
+    border-radius: 4px;
+}
