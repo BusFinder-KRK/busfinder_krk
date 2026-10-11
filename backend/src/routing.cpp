@@ -26,18 +26,14 @@ bool operator<(const Routing::Node &n1, const Routing::Node &n2) {
 
 Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time)
     : sf_(adjacent_stops), ttable_(default_query, time.get_sys_time()),translator_() {
-    std::cout << "we are in routing constructor" << '\n';
     ttable_.generate_table();
-    std::cout << "the table was generated" << '\n';
     load_walking_csv();
-    std::cout << "the csv was loaded" << '\n';
 
 }
 
 void Routing::load_walking_csv() {
     std::ifstream file(csv_path_);
     if (!file.is_open()) {
-        std::cout << "couldnt open the csv" << '\n';
         return;
     }
     std::string line;
@@ -178,7 +174,6 @@ std::optional<Routing::NodeTransport> Routing::walking_between_stops_reverse( co
 }
 
 std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::NodeTransport>>> Routing::dijkstra_dalekowzrocznosc( const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time) {
-    std::cout<< "we are inisde dijkstra" << '\n';
     /* PLAN:
      * - record of distances - the table so far, so its easy to look up the nodes
      * - prev - table with prevous nodes
@@ -303,7 +298,6 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
                 relax_edge(new_stop, safe_nt, add_cost);
             }
         }
-        //std::cout <<"-------START----------" << '\n';
     }
 
     if (ending_node.stop_name.empty()) {
@@ -319,18 +313,14 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
         help.push_back((prev[help.back()]));
     }
     std::reverse(help.begin(), help.end());
-    std::cout << "==================" << '\n';
-    std::cout << "normal dijkstra" << '\n';
     std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> ans;
     for (const auto &node: help) {
-        std::cout << node.line_id<< " " << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " <<node.stop_name << " " << std::format("{:%T}", record_of_distances[node].first.real_time) << " " <<std::format("{:%T}", record_of_distances[node].second.arrival) <<" " <<std::format("{:%T}", record_of_distances[node].second.departure) << '\n';
         ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;
 }
 
 std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::NodeTransport>>> Routing::dijkstra_new_reversed( const std::string &start, const std::string &target, std::chrono::zoned_time<std::chrono::seconds> time) {
-    std::cout<< "we are inisde reversed" << '\n';
     Node start_node{start, "end"};
     NodeTimeInfo start_node_time{0, time};
     NodeTransport start_node_trans{"end", time, time};
@@ -447,11 +437,10 @@ std::vector<std::pair<Routing::Node, std::pair<Routing::NodeTimeInfo, Routing::N
             break;
         help.push_back((prev[help.back()]));
     }
-    std::cout << "==================" << '\n';
-    std::cout << "reveresed dijkstra" << '\n';
+    //std::cout << "reveresed dijkstra" << '\n';
     std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> ans;
     for (const auto &node: help) {
-        std::cout << node.line_id<< " " << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].first.real_time) << " " <<std::format("{:%T}", record_of_distances[node].second.arrival) <<" " <<std::format("{:%T}", record_of_distances[node].second.departure) << '\n';
+        //std::cout << node.line_id<< " " << translator_.get_human_line(node.line_id) << " " << translator_.get_human_stop_name(node.stop_name) << " " << std::format("{:%T}", record_of_distances[node].first.real_time) << " " <<std::format("{:%T}", record_of_distances[node].second.arrival) <<" " <<std::format("{:%T}", record_of_distances[node].second.departure) << '\n';
         ans.emplace_back(node, record_of_distances[node]);
     }
     return ans;
@@ -473,7 +462,6 @@ RouteData Routing::output(const std::string &start, const std::string &target,
               i++;
           }
           int end = i-1;
-          // std::cout << "from " << start << " to end " << i << '\n';
 
           endgame_vec.emplace_back(
           vec[start].first.stop_name,
@@ -493,11 +481,6 @@ RouteData Routing::output(const std::string &start, const std::string &target,
           );
       }
 
-      std::cout << " FOR TESTING:" << '\n';
-
-      // for (const auto& rd : endgame_vec) {
-          // std::cout << rd.stop_id << " " << rd.stop_coords.first << " " << rd.stop_coords.second<< " " << rd.stop_name << " " << rd.route_name << " " << rd.time << " " << rd.type << '\n';
-      // }
 
       endgame.route_proper = endgame_vec;
       endgame.start_stop = start;
