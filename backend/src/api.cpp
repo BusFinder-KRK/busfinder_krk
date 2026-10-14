@@ -8,6 +8,7 @@
 api::api() {
   CROW_ROUTE(app_, "/route/route_stops")
   ([](const crow::request &req) {
+    const auto start = std::chrono::system_clock::now();
     char *stopid1 = req.url_params.get("stopid1");
     char *stopid2 = req.url_params.get("stopid2");
     char *datetime = req.url_params.get("datetime");
@@ -22,6 +23,8 @@ api::api() {
     auto parsed_time = parse_time(datetime);
     Routing r(parsed_time);
     const RouteData route = r.output(stopid1, stopid2, parsed_time);
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
+    std::cout << "search duration: " << duration.count() / 1000 << "s " << duration.count() % 1000 << "ms" << std::endl;
     return crow::response(make_default_response(route));
   });
 
