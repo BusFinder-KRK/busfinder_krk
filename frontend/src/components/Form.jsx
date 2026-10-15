@@ -2,8 +2,7 @@ import { useState } from "react"
 import StopInput from "./minor/StopInput"
 import "../style/components/Form.css"
 
-function Form({ startInput, endInput, setStartInput, setEndInput, handleSubmit }) { 
-    
+function Form({ startInput, endInput, setStartInput, setEndInput, handleSubmit }) {
 
     return (
         <form name="route-form" onSubmit={handleSubmit} className="route-form">

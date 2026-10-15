@@ -1,7 +1,7 @@
 #include <api.h>
+#include <chrono>
 #include <crow.h>
 #include <route_data.h>
-#include <chrono>
 #include <routing.h>
 #include <translator.h>
 
@@ -18,13 +18,15 @@ api::api() {
     if (!stopid2)
       return crow::response(400, "Missing 'stopid2' parameter");
     if (!datetime)
-      return crow::response(400, "Missing 'time' parameter");
+      return crow::response(400, "Missing 'datetime' parameter");
 
     auto parsed_time = parse_time(datetime);
-    Routing r(parsed_time);
+    Routing r = make_routing(parsed_time, req);
     const RouteData route = r.output(stopid1, stopid2, parsed_time);
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
-    std::cout << "search duration: " << duration.count() / 1000 << "s " << duration.count() % 1000 << "ms" << std::endl;
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now() - start);
+    std::cout << "search duration: " << duration.count() / 1000 << "s "
+              << duration.count() % 1000 << "ms" << std::endl;
     return crow::response(make_default_response(route));
   });
 
@@ -47,7 +49,6 @@ api::api() {
     if (!datetime)
       return crow::response(400, "Missing 'time' parameter");
 
-
     // auto parsed_time = parse_time(datetime);
     // Routing r(parsed_time);
     // const route_data route = r.output(stopid1, stopid2, parsed_time);
@@ -55,9 +56,35 @@ api::api() {
   });
 
   CROW_ROUTE(app_, "/stops")
-  ([](){
-    return crow::response(make_stop_list());
-  });
+  ([]() { return crow::response(make_stop_list()); });
+}
+
+Routing
+api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
+                  const crow::request &req) {
+  const int search_window =
+      std::stoi(req.url_params.get("search_window") != nullptr
+                    ? req.url_params.get("search_window")
+                    : "30");
+  const double time_for_change =
+      std::stod(req.url_params.get("time_for_change") != nullptr
+                    ? req.url_params.get("time_for_change")
+                    : "0.5");
+  const double walking_multiplier =
+      std::stod(req.url_params.get("walking_multiplier") != nullptr
+                    ? req.url_params.get("walking_multiplier")
+                    : "1.01");
+  const int walking_pace =
+      std::stoi(req.url_params.get("walking_pace") != nullptr
+                    ? req.url_params.get("walking_pace")
+                    : "60");
+  const int adjacent_stops =
+      std::stoi(req.url_params.get("adjacent_stops") != nullptr
+                    ? req.url_params.get("adjacent_stops")
+                    : "40");
+
+  return Routing(parsed_time, search_window, time_for_change,
+                 walking_multiplier, walking_pace, adjacent_stops);
 }
 
 crow::json::wvalue api::make_default_response(const RouteData &data) {
@@ -99,7 +126,7 @@ crow::json::wvalue api::make_stop_list() {
   crow::json::wvalue result;
   std::vector<crow::json::wvalue> stop_list;
   stop_list.reserve(stop_list_generator.stop_name_.size());
-  for (const auto& [id, name] : stop_list_generator.stop_name_) {
+  for (const auto &[id, name] : stop_list_generator.stop_name_) {
     crow::json::wvalue entry;
     entry["id"] = id;
     entry["name"] = name;
