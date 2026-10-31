@@ -6,8 +6,9 @@ h1 {
 }
 
 .hdr{
-    top: 0;
-    position: sticky;
+    position: relative;
+    z-index: 1;
+
     align-items: center;
     justify-content: center;
     display: flex;

@@ -1,5 +1,7 @@
-import { use, useContext, useEffect, useRef, useState } from "react";
 import StopsContext from "../../context/StopsContext";
+
+import { useContext, useEffect, useRef, useState } from "react";
+
 import "../../style/components/Form.css"
 
 function StopInput({ inputType, input, setInput }) {
@@ -27,12 +29,12 @@ function StopInput({ inputType, input, setInput }) {
     function handleInput(e) {
         const value = e.target.value;
         setQuery(value);
-        if(input != "" && value != input) {
-            setInput({id: "", name: ""});
+        if (input != "" && value != input) {
+            setInput({ id: "", name: "" });
         }
-        if(query.trim().length > 1 && !isLoading) {
-            const filtered = stops.filter( 
-                (stop) => 
+        if (query.trim().length > 1 && !isLoading) {
+            const filtered = stops.filter(
+                (stop) =>
                     stop.name.toLowerCase().includes(value.toLowerCase())
             );
             setSuggestions(filtered)
@@ -55,11 +57,11 @@ function StopInput({ inputType, input, setInput }) {
 
     return (
         <div className="stop-input" ref={containerRef}>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 name={inputType}
                 id={inputType}
-                value={query} 
+                value={query}
                 autoComplete="off"
                 onChange={handleInput}
                 onFocus={handleFocus}
@@ -69,14 +71,14 @@ function StopInput({ inputType, input, setInput }) {
                 <ul className="autocomplete-search">
                     {
                         suggestions.map((item) => (
-                            <li key={item.id} onClick={() => handleSelect(item) }>
+                            <li key={item.id} onClick={() => handleSelect(item)}>
                                 {item.name}
                             </li>
                         ))
                     }
-                </ul> 
+                </ul>
             )}
-       </div>
+        </div>
     );
 }
 

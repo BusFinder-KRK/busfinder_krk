@@ -14,15 +14,15 @@ export function StopsProvider({ children }) {
 
 
 
-    useEffect( () => { 
+    useEffect(() => {
         async function getStops() {
             try {
                 const response = await fetch("/api/stops");
-                if(!response.ok) throw new Error("Failed to fetch.");
+                if (!response.ok) throw new Error("Failed to fetch.");
                 const data = await response.json();
-                for(const entry of data["stoplist"]) {
-                    console.log(entry);
-                }
+                // for(const entry of data["stoplist"]) {
+                //     console.log(entry);
+                // }
                 setStops(data["stoplist"]);
             } catch (error) {
                 console.error("Failed to load stops: ", error);
@@ -30,7 +30,7 @@ export function StopsProvider({ children }) {
                 setLoading(false);
             }
         }
-        getStops(); 
+        getStops();
     }, []);
     return (
         <StopsContext value={{ stops, isLoading }}>

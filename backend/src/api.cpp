@@ -62,6 +62,8 @@ api::api() {
 Routing
 api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
                   const crow::request &req) {
+  char *walking_test = req.url_params.get("walking_pace");
+  std::cout << walking_test << std::endl;
   const int search_window =
       std::stoi(req.url_params.get("search_window") != nullptr
                     ? req.url_params.get("search_window")
@@ -74,17 +76,13 @@ api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
       std::stod(req.url_params.get("walking_multiplier") != nullptr
                     ? req.url_params.get("walking_multiplier")
                     : "1.01");
-  const int walking_pace =
-      std::stoi(req.url_params.get("walking_pace") != nullptr
-                    ? req.url_params.get("walking_pace")
-                    : "60");
   const int adjacent_stops =
       std::stoi(req.url_params.get("adjacent_stops") != nullptr
                     ? req.url_params.get("adjacent_stops")
                     : "40");
 
   return Routing(parsed_time, search_window, time_for_change,
-                 walking_multiplier, walking_pace, adjacent_stops);
+                 walking_multiplier, 60, adjacent_stops);
 }
 
 crow::json::wvalue api::make_default_response(const RouteData &data) {

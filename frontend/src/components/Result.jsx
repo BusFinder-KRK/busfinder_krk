@@ -1,6 +1,7 @@
 import ResultNodeGetOn from "./minor/ResultNodeGetOn";
 import ResultNodeGetOff from "./minor/ResultNodeGetOff";
 import ResultNodeWalk from "./minor/ResultNodeWalk";
+
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 
 import "../style/components/Result.css";

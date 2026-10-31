@@ -16,7 +16,7 @@ public:
   const int search_window;
   const double time_for_change;
   const double walking_multiplier;
-  const int walking_pace;
+  const double walking_pace;
   const int adjacent_stops;
   Translator translator_{};
 
@@ -41,9 +41,9 @@ public:
   };
 
   explicit Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
-                   int search_window_arg, double time_for_change_arg = 0.5,
-                   double walking_multiplier_arg = 1.01,
-                   int walking_pace_arg = 60, int adjacent_stops_arg = 40);
+                   int search_window_arg, double time_for_change_arg,
+                   double walking_multiplier_arg, double walking_pace_arg,
+                   int adjacent_stops_arg);
 
   // moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
   RouteData output(const std::string &start, const std::string &target,

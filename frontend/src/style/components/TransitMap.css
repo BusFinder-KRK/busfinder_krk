@@ -1,0 +1,14 @@
+.transit-map{
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    justify-content: center;
+}
+
+.map-inner-wrapper {
+    margin-top: 7vh;
+    height: 80%;
+    width: 80%;
+    border: 2px solid rgb(255, 143, 31);
+    border-radius: 2px;
+}

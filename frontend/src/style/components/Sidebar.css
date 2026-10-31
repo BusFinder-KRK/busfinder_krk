@@ -1,0 +1,37 @@
+div.sidebar {
+    position: sticky;
+    grid-area: sidebar;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    height: 89vh;
+
+    align-self: stretch;
+    justify-self: right;
+
+    width: 100%;
+    min-width: 40%;
+    max-width: 100%;
+
+    overflow: scroll;
+    /* border: 2px solid black; */
+    border-left: 1px solid rgb(195, 226, 255);
+    color: rgb(195, 226, 255);
+    
+}
+
+.sidebar h2 {
+    display: block;
+    margin-top: 0.8vh;
+    margin-bottom: 1.5vh;
+    padding-bottom: 1vh;
+    font-size: 1.8em;
+    text-align: center;
+    color:rgb(255, 143, 31);
+    border-bottom: 1px solid;
+}
+
+.sidebar form{
+    margin: 1vw;
+}

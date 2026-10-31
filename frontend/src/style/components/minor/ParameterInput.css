@@ -1,0 +1,65 @@
+
+.sidebar span.parameter-name {
+    font-weight: bold;
+    color:#7575adfb;
+}
+
+.sidebar .parameter-input label {
+    display: block;
+    margin: 2vh auto;
+}
+
+.parameter-input .parameter-input-field {
+    display: flex;
+    width: auto;
+    align-content: center;
+    justify-content: space-between;
+    margin-right: 12vw;
+    margin: 0.6vw;
+    background-color: rgba(121, 102, 102, 0.1);
+    border: 1.5px solid #9192c7fb;
+    border-radius: 5px;
+    height: 2.5em;
+    overflow: scroll;
+}
+
+.parameter-input .parameter-input-field input {
+    appearance: textfield;
+    -moz-appearance: textfield;
+    border: none;
+    width: 9.85vw;
+    background: none;
+    padding-left: 0.6em;
+    color:rgb(255, 143, 31);
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.parameter-input .parameter-input-field input:focus-visible {
+    outline: none;
+}
+
+.parameter-input .parameter-input-field .custom-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-items: right;
+    gap: 6px;
+    margin-right: 6px;
+}
+
+.parameter-input .parameter-input-field .custom-buttons button{
+    position: relative;
+    background-color: transparent;
+    cursor: pointer;
+    color: rgb(196, 226, 255);
+    border: none;
+    padding-right: 0.2em;
+    font-size: 0.7em;
+}
+
+.parameter-input .parameter-input-field .custom-buttons button.reset {
+    position: relative;
+    font-size: 0.8em;
+    color: rgb(255, 143, 31);
+    font-weight: 600;
+}

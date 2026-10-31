@@ -25,17 +25,13 @@ bool operator<(const Routing::Node &n1, const Routing::Node &n2) {
 
 // for the routing:
 Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
-      const int search_window_arg,
-      const double time_for_change_arg,
-      const double walking_multiplier_arg,
-      const int walking_pace_arg,
-      const int adjacent_stops_arg):
-        sf_{adjacent_stops}, ttable_{default_query, time_arg.get_sys_time()},
-        search_window{search_window_arg},
-        time_for_change{time_for_change_arg},
-        walking_multiplier{walking_multiplier_arg},
-        walking_pace{walking_pace_arg},
-        adjacent_stops{adjacent_stops_arg} {
+                 const int search_window_arg, const double time_for_change_arg,
+                 const double walking_multiplier_arg,
+                 const double walking_pace_arg, const int adjacent_stops_arg)
+    : sf_{adjacent_stops}, ttable_{default_query, time_arg.get_sys_time()},
+      search_window{search_window_arg}, time_for_change{time_for_change_arg},
+      walking_multiplier{walking_multiplier_arg},
+      walking_pace{walking_pace_arg}, adjacent_stops{adjacent_stops_arg} {
 
   ttable_.generate_table();
   load_walking_csv();
@@ -92,7 +88,8 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops(
                        std::chrono::zoned_time{time.get_time_zone(), t1},
                        std::chrono::zoned_time{time.get_time_zone(), t2}};
       result.push_back(nt);
-      if (t1 > local_timepoint + std::chrono::minutes(search_window))
+      if (t1 >
+          local_timepoint + static_cast<std::chrono::minutes>(search_window))
         break;
     }
   }
