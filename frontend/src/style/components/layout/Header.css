@@ -2,7 +2,7 @@ h1 {
     margin: 0px;
     height: max(20px, 5.5vh);
     color: rgb(255, 143, 31);
-    font-size: max(15px, 4.5vh);
+    font-size: max(15px, 4vh);
 }
 
 .hdr{

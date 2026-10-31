@@ -6,10 +6,12 @@ export default function InfoWindow({ isOpen, onClose }) {
     if (!isOpen) return null;
 
     return (
-        <div className="info-window">
-            <button className="exit-button" onClick={onClose} aria-label="Close" />
-            <h2>About this project</h2>
-            <p></p>
+        <div className="info-background">
+            <div className="info-window">
+                <button className="exit-button" onClick={onClose} aria-label="Close" />
+                <h2>About this project</h2>
+                <p></p>
+            </div>
         </div>
     );
 }
