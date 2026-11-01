@@ -1,9 +1,9 @@
 
 #environment variables
-/backend/.env
+/.env
 .env.*
-**/.env
-**/.env.*
-!/backend/.env.example
+.env
+.env.example
+!/.env.example
 #database dump
 **/*.sql
