@@ -52,7 +52,7 @@ public:
                            std::chrono::zoned_time<std::chrono::seconds> time);
 
 private:
-  std::filesystem::path csv_path_ = WALKING_CSV_PATH;
+  std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
   std::unordered_map<std::pair<std::string, std::string>, double, PairHash>
       walking_times_; // pairhash from transporttable.h
   TransportTable ttable_;

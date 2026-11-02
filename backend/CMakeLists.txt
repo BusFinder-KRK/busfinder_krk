@@ -57,14 +57,3 @@ set_target_properties(backend PROPERTIES
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
 )
-
-# copy the .env file to the build folder
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/.env
-        ${CMAKE_CURRENT_BINARY_DIR}/.env
-        COPYONLY
-)
-
-target_compile_definitions(backend PRIVATE
-        WALKING_CSV_PATH="${CMAKE_CURRENT_SOURCE_DIR}/scripts/walking_times/walking_times.csv"
-)
