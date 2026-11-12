@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${user}
+      POSTGRES_PASSWORD: ${password}
+      POSTGRES_DB: ${dbname}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/gtfs/gtfs_baza.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      retries: 12
+
+  backend:
+    build: ./backend
+    environment:
+      host: db
+      port: ${port}
+      dbname: ${dbname}
+      user: ${user}
+      password: ${password}
+      TZ: Europe/Warsaw
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/scripts/walking_times:/backend/scripts/walking_times:ro
+    ports:
+      - "18080:18080"
+
+volumes:
+  pgdata:
+#later to do:
+# csv file
+# scrpits build
