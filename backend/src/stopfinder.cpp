@@ -4,18 +4,7 @@
 
 #include "config.h"
 
-// NOTE:=================
-// I'm increamnting the num by 1 bc the first elem of vector will alawyas be the
-// node itslef
-//=======================
-
-// TO DO:===============
-//- the convertion - I'm currently keeping it in degrees, but i want to change
-//it to meteres - questions:
-//- when so it's the fastest? // -are we sure wee need it? (proabbly for
-//theasfty so yeah)
-//=====================
-StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) { // p1 - latitude, p2 - longitude
+StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) {
   p1 *= M_PI / 180.0;
   p2 *= M_PI / 180.0;
   constexpr double ref_meridian = 0.331612557;
@@ -62,11 +51,6 @@ void StopFinder::generate_map() {
   transaction.commit();
 }
 
-// TO DO:===============
-//- maybe you can do the vector even faster keep the number_foStops_vector
-//inilisaized in the constructor and then you will just clena it? will that be
-//faster or sis cleaning slow (im guessing its faster but later check it)
-//=====================
 std::vector<std::pair<std::string, double>>
 StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   auto test = coordinates_.begin();
@@ -96,5 +80,5 @@ std::pair<double, double> StopFinder::get_coords(const std::string& busstop) con
   if (auto it = coordinates_.find(busstop); it != coordinates_.end()) {
     return it->second;
   }
-  return {0.0, 0.0};//fallback (if its needed check the db)
+  return {0.0, 0.0};
 }

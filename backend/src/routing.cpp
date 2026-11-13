@@ -1,20 +1,8 @@
 #include <fstream>
 #include <queue>
 #include <routing.h>
-
 #include "crow/mustache.h"
 
-////MAKE SURE THAT DEPARTURE AND ARRIVAL IN REVERESED IS GOOD
-// shoudl i keep the continue on walk walk?
-// maybe get rid of the safty net punishemtn??
-
-//==================================================
-// TO DO FOR OVERREAL PERFOMANCE
-// maybe later switch the line ID to be and integer since ints are faster: for
-// exaple instead of doing "walk" do a -1 or sth
-//==================================================
-
-// for Node struct
 bool operator<(const Routing::Node &n1, const Routing::Node &n2) {
   if (n1.stop_name < n2.stop_name)
     return true;
@@ -23,7 +11,6 @@ bool operator<(const Routing::Node &n1, const Routing::Node &n2) {
   return false;
 }
 
-// for the routing:
 Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
                  const int search_window_arg, const double time_for_change_arg,
                  const double walking_multiplier_arg,
@@ -36,12 +23,6 @@ Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
   ttable_.generate_table();
   load_walking_csv();
 }
-
-// Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time)
-//     : sf_(adjacent_stops), ttable_(default_query, time.get_sys_time()) {
-//   ttable_.generate_table();
-//   load_walking_csv();
-// }
 
 void Routing::load_walking_csv() {
   std::ifstream file(csv_path_);
@@ -195,32 +176,6 @@ std::vector<std::pair<Routing::Node,
 Routing::dijkstra_dalekowzrocznosc(
     const std::string &start, const std::string &target,
     std::chrono::zoned_time<std::chrono::seconds> time) {
-  /* PLAN:
-   * - record of distances - the table so far, so its easy to look up the nodes
-   * - prev - table with prevous nodes
-   * - pq - the prority queue
-   *
-   * NODE:
-   * [ - Bus stop name ("Kapelanka"),
-   * - ID name of the line / or "wall" ]
-   *
-   *NODE_TIME_INFO
-   *[time from start of the journy, time the bus takes off]
-   *
-   *NODE_TRANSPORT_INFO
-   *bus_name (std::string)
-   *departure
-   *arrival
-   *
-   *  ROCORD OF DISTACES = MAP: //change should i add nodetraposrt here too?
-   *  [NODE] = [NODE_TIME_INFO]
-   *
-   *  PQ
-   *  [COST, NODE]
-   *
-   *  PREV
-   *  [NODE, NODE]
-   */
   Node start_node{start, "start"};
   NodeTimeInfo start_node_time{0, time};
   NodeTransport start_node_trans{"start", time, time};
@@ -476,13 +431,6 @@ Routing::dijkstra_new_reversed(
   // std::cout << "reveresed dijkstra" << '\n';
   std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>> ans;
   for (const auto &node : help) {
-    // std::cout << node.line_id<< " " <<
-    // translator_.get_human_line(node.line_id) << " " <<
-    // translator_.get_human_stop_name(node.stop_name) << " " <<
-    // std::format("{:%T}", record_of_distances[node].first.real_time) << " "
-    // <<std::format("{:%T}", record_of_distances[node].second.arrival) <<" "
-    // <<std::format("{:%T}", record_of_distances[node].second.departure) <<
-    // '\n';
     ans.emplace_back(node, record_of_distances[node]);
   }
   return ans;

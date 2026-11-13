@@ -39,7 +39,7 @@ public:
   std::optional<pqxx::connection> connection_;
 
   std::unordered_map<std::string, std::pair<double, double>>
-      coordinates_; // int GTFS file the lan and lon: 50.072490,20.028500
+      coordinates_;
   KdtreeStruct ks;
   nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::L2_Simple_Adaptor<double, KdtreeStruct>, KdtreeStruct, 2,
@@ -50,10 +50,6 @@ public:
   void generate_map();
   std::pair<double, double> get_coords(const std::string &busstop) const;
 
-  // metohod to get you the closest n number of stops based on a stop name
-  // returns paif - stop ID and distance between the stops
   std::vector<std::pair<std::string, double>>
   find_stop_ids(const std::string &stopid);
-
-  // private: do - it later
 };

@@ -21,23 +21,23 @@ public:
   Translator translator_{};
 
   struct Node {
-    std::string stop_name; // for example "Kapelanka07"
-    std::string line_id;   // or "walk"
+    std::string stop_name;
+    std::string line_id;
 
     friend bool operator<(const Node &n1, const Node &n2);
   };
 
-  struct NodeTimeInfo {
-    float cost_from_start; // time from start of the journy
+    struct NodeTimeInfo {
+    float cost_from_start;
     std::chrono::zoned_time<std::chrono::seconds>
-        real_time; // for example 15:49:23
-                   // in python there was also the line id here again?
+        real_time;
+
   };
 
   struct NodeTransport {
-    std::string line_id; // can i get rid of this one here?
-    std::chrono::zoned_time<std::chrono::seconds> departure; // 15:00:00
-    std::chrono::zoned_time<std::chrono::seconds> arrival;   // 15:03:00
+    std::string line_id;
+    std::chrono::zoned_time<std::chrono::seconds> departure;
+    std::chrono::zoned_time<std::chrono::seconds> arrival;
   };
 
   explicit Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
@@ -45,7 +45,6 @@ public:
                    double walking_multiplier_arg, double walking_pace_arg,
                    int adjacent_stops_arg);
 
-  // moze potem dodaj konstruktor ktory bedzie zmieniac parametry wyzej?
   RouteData output(const std::string &start, const std::string &target,
                    std::chrono::zoned_time<std::chrono::seconds> time);
   RouteData output_testing(const std::string &start, const std::string &target,
@@ -54,7 +53,7 @@ public:
 private:
   std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
   std::unordered_map<std::pair<std::string, std::string>, double, PairHash>
-      walking_times_; // pairhash from transporttable.h
+      walking_times_;
   TransportTable ttable_;
   StopFinder sf_;
 
@@ -81,13 +80,9 @@ private:
   dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
                             std::chrono::zoned_time<std::chrono::seconds> time);
 
-  std::vector<std::pair<Node, NodeTimeInfo>> dijkstra_dalekowzrocznosc_reversed(
-      const std::string &start, const std::string &target,
-      std::chrono::zoned_time<std::chrono::seconds> time,
-      std::string ending_line);
   std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>>
   dijkstra_new_reversed(const std::string &start, const std::string &target,
                         std::chrono::zoned_time<std::chrono::seconds> time);
 };
 
-#endif // BUSFINDER_BACKEND_ROUTER_H
+#endif // BUSFINDER_BACKEND_ROUTING_H
