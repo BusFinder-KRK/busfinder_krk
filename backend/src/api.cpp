@@ -24,9 +24,9 @@ api::api() {
     Routing r = make_routing(parsed_time, req);
     const RouteData route = r.output(stopid1, stopid2, parsed_time);
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now() - start);
+      std::chrono::system_clock::now() - start);
     std::cout << "search duration: " << duration.count() / 1000 << "s "
-              << duration.count() % 1000 << "ms" << std::endl;
+        << duration.count() % 1000 << "ms" << std::endl;
     return crow::response(make_default_response(route));
   });
 
@@ -56,30 +56,30 @@ api::api() {
   });
 
   CROW_ROUTE(app_, "/stops")
-  ([]() { return crow::response(make_stop_list()); });
+      ([]() { return crow::response(make_stop_list()); });
 }
 
 Routing
 api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
                   const crow::request &req) {
   char *walking_test = req.url_params.get("walking_pace");
-  std::cout << walking_test << std::endl;
+
   const int search_window =
       std::stoi(req.url_params.get("search_window") != nullptr
-                    ? req.url_params.get("search_window")
-                    : "30");
+                  ? req.url_params.get("search_window")
+                  : "30");
   const double time_for_change =
       std::stod(req.url_params.get("time_for_change") != nullptr
-                    ? req.url_params.get("time_for_change")
-                    : "0.5");
+                  ? req.url_params.get("time_for_change")
+                  : "0.5");
   const double walking_multiplier =
       std::stod(req.url_params.get("walking_multiplier") != nullptr
-                    ? req.url_params.get("walking_multiplier")
-                    : "1.01");
+                  ? req.url_params.get("walking_multiplier")
+                  : "1.01");
   const int adjacent_stops =
       std::stoi(req.url_params.get("adjacent_stops") != nullptr
-                    ? req.url_params.get("adjacent_stops")
-                    : "40");
+                  ? req.url_params.get("adjacent_stops")
+                  : "40");
 
   return Routing(parsed_time, search_window, time_for_change,
                  walking_multiplier, 60, adjacent_stops);
@@ -94,7 +94,7 @@ crow::json::wvalue api::make_default_response(const RouteData &data) {
   std::vector<crow::json::wvalue> route_proper;
   route_proper.reserve(data.route_proper.size());
 
-  for (const auto &node : data.route_proper) {
+  for (const auto &node: data.route_proper) {
     crow::json::wvalue route_proper_node;
     route_proper_node["stop_id"] = node.stop_id;
     route_proper_node["stop_coords"] =
@@ -116,6 +116,8 @@ api::parse_time(const std::string &time_str) {
   std::chrono::local_time<std::chrono::seconds> parsed_local;
 
   ss >> std::chrono::parse("%Y-%m-%d %H:%M:%S", parsed_local);
+  if (ss.fail())
+    throw std::invalid_argument("The time string is ill-formed.");
   return std::chrono::zoned_time{"Europe/Warsaw", parsed_local};
 }
 
@@ -124,7 +126,7 @@ crow::json::wvalue api::make_stop_list() {
   crow::json::wvalue result;
   std::vector<crow::json::wvalue> stop_list;
   stop_list.reserve(stop_list_generator.stop_name_.size());
-  for (const auto &[id, name] : stop_list_generator.stop_name_) {
+  for (const auto &[id, name]: stop_list_generator.stop_name_) {
     crow::json::wvalue entry;
     entry["id"] = id;
     entry["name"] = name;

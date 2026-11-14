@@ -24,14 +24,19 @@ public:
     std::string stop_name;
     std::string line_id;
 
-    friend bool operator<(const Node &n1, const Node &n2);
+    /**
+     * Default three-way operator; will compare the nodes by the text fields in the order they are declared.
+     * @param n1 node 1
+     * @param n2 node 2
+     * @return < 0 if the n1 comes first, > 0 if n2 comes first and 0 if nodes are equal.
+     */
+    friend auto operator<=>(const Node &n1, const Node &n2) = default;
   };
 
-    struct NodeTimeInfo {
+  struct NodeTimeInfo {
     float cost_from_start;
     std::chrono::zoned_time<std::chrono::seconds>
-        real_time;
-
+    real_time;
   };
 
   struct NodeTransport {
@@ -47,13 +52,11 @@ public:
 
   RouteData output(const std::string &start, const std::string &target,
                    std::chrono::zoned_time<std::chrono::seconds> time);
-  RouteData output_testing(const std::string &start, const std::string &target,
-                           std::chrono::zoned_time<std::chrono::seconds> time);
 
 private:
   std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
   std::unordered_map<std::pair<std::string, std::string>, double, PairHash>
-      walking_times_;
+  walking_times_;
   TransportTable ttable_;
   StopFinder sf_;
 
@@ -64,8 +67,8 @@ private:
                           const std::string &stop_id2,
                           std::chrono::zoned_time<std::chrono::seconds> time);
   std::vector<NodeTransport> transport_between_stops_reverse(
-      const std::string &stop_id1, const std::string &stop_id2,
-      std::chrono::zoned_time<std::chrono::seconds> time);
+    const std::string &stop_id1, const std::string &stop_id2,
+    std::chrono::zoned_time<std::chrono::seconds> time);
 
   std::optional<NodeTransport>
   walking_between_stops(const std::string &stop_id1,
@@ -73,14 +76,14 @@ private:
                         std::chrono::zoned_time<std::chrono::seconds> time);
 
   std::optional<NodeTransport> walking_between_stops_reverse(
-      const std::string &stop_id1, const std::string &stop_id2,
-      std::chrono::zoned_time<std::chrono::seconds> time);
+    const std::string &stop_id1, const std::string &stop_id2,
+    std::chrono::zoned_time<std::chrono::seconds> time);
 
-  std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>>
+  std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport> > >
   dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
                             std::chrono::zoned_time<std::chrono::seconds> time);
 
-  std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport>>>
+  std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport> > >
   dijkstra_new_reversed(const std::string &start, const std::string &target,
                         std::chrono::zoned_time<std::chrono::seconds> time);
 };

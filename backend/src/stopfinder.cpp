@@ -4,34 +4,42 @@
 
 #include "config.h"
 
-StopData::StopData(std::string s, double p1, double p2) : stop_id(std::move(s)) {
-  p1 *= M_PI / 180.0;
-  p2 *= M_PI / 180.0;
-  constexpr double ref_meridian = 0.331612557;
+/**
+ * Creates a StopData object with the stop coordinates converted to UTM
+ * @param s The stop's ID
+ * @param latitude The stop's latitude
+ * @param longitude The stop's longitude
+ */
+StopData::StopData(std::string s, double latitude, double longitude) : stop_id(std::move(s)) {
+  latitude *= M_PI / 180.0;
+  longitude *= M_PI / 180.0;
+  constexpr double ref_meridian = 0.3665191429;
   constexpr double E0 = 500000.0;
   constexpr double k0 = 0.9996;
   constexpr double N0 = 0;
 
   constexpr double a = 6378137.0;
   constexpr double f = 0.00335281066474781;
-  constexpr double n = f/(2 - f);
+  constexpr double n = f / (2 - f);
 
-  const double A = a*(1+ pow(n,2)/4 + pow(n,4)/64)/(1+n);
+  constexpr double A = a * (1 + n * n / 4 + n * n * n * n / 64) / (1 + n);
 
-  const double alpha1 = 0.5*n - 2.0/3 * pow(n,2) + 5.0/16 * pow(n,3);
-  const double alpha2 = 13.0/48 * pow(n,2) - 3.0/5 * pow(n,3);
-  const double alpha3 = 61.0/240 * pow(n,3);
+  constexpr double alpha1 = 0.5 * n - 2.0 / 3 * n * n + 5.0 / 16 * n * n * n;
+  constexpr double alpha2 = 13.0 / 48 * n * n - 3.0 / 5 * n * n * n;
+  constexpr double alpha3 = 61.0 / 240 * n * n * n;
 
-  const double t = sinh(atanh(sin(p1)) - 2*sqrt(n)/(1 + n) * atanh(2*sqrt(n)/(1 + n) * sin(p1)));
-  const double xiprime = atan(t/cos(p2 - ref_meridian));
-  const double etaprime = atanh(sin(p2 - ref_meridian)/sqrt(1 + t*t));
+  const double t = sinh(atanh(sin(latitude)) - 2 * sqrt(n) / (1 + n) * atanh(2 * sqrt(n) / (1 + n) * sin(latitude)));
+  const double xiprime = atan2(t, cos(longitude - ref_meridian));
+  const double etaprime = atanh(sin(longitude - ref_meridian) / sqrt(1 + t * t));
 
-  x = E0 + k0*A*(etaprime + alpha1*cos(2*xiprime)*sinh(2*etaprime) + alpha2*cos(4*xiprime)*sinh(4*etaprime) +  alpha3*cos(6*xiprime)*sinh(6*etaprime));
-  y = N0 + k0*A*(xiprime + alpha1*sin(2*xiprime)*cosh(2*etaprime) + alpha2*sin(4*xiprime)*cosh(4*etaprime) + alpha3*sin(6*xiprime)*cosh(6*etaprime));
+  x = E0 + k0 * A * (etaprime + alpha1 * cos(2 * xiprime) * sinh(2 * etaprime) + alpha2 * cos(4 * xiprime) *
+                     sinh(4 * etaprime) + alpha3 * cos(6 * xiprime) * sinh(6 * etaprime));
+  y = N0 + k0 * A * (xiprime + alpha1 * sin(2 * xiprime) * cosh(2 * etaprime) + alpha2 * sin(4 * xiprime) *
+                     cosh(4 * etaprime) + alpha3 * sin(6 * xiprime) * cosh(6 * etaprime));
 }
 
 StopFinder::StopFinder(const int &num)
-    : number_of_stops(num + 1), wrapper_tree_(2, ks) {
+  : number_of_stops(num + 1), wrapper_tree_(2, ks) {
   generate_map();
   wrapper_tree_.buildIndex();
 }
@@ -42,7 +50,7 @@ void StopFinder::generate_map() {
       std::vformat(test_query, std::make_format_args(number_of_stops));
   connection_.emplace(Config::connection_string);
   pqxx::work transaction{*connection_};
-  for (const auto &[stopid, lan, lon] :
+  for (const auto &[stopid, lan, lon]:
        transaction.query<std::string, double, double>(filled_query)) {
     StopData sd(stopid, lan, lon);
     coordinates_[stopid] = {(sd.x), (sd.y)};
@@ -51,7 +59,7 @@ void StopFinder::generate_map() {
   transaction.commit();
 }
 
-std::vector<std::pair<std::string, double>>
+std::vector<std::pair<std::string, double> >
 StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   auto test = coordinates_.begin();
 
@@ -64,19 +72,19 @@ StopFinder::find_stop_ids(const std::basic_string<char> &stopid) {
   std::vector<double> out_dist_sq(number_of_stops);
 
   const size_t n_of_valid_stops = wrapper_tree_.knnSearch(points, number_of_stops, out_indices.data(),
-                          out_dist_sq.data());
+                                                          out_dist_sq.data());
 
-  std::vector<std::pair<std::string, double>> closest;
+  std::vector<std::pair<std::string, double> > closest;
   closest.reserve(number_of_stops);
 
   for (size_t i = 1; i < n_of_valid_stops; ++i) {
     closest.emplace_back(ks.tree_vec_[out_indices[i]].stop_id,
-                                     sqrt(out_dist_sq[i]));
+                         sqrt(out_dist_sq[i]));
   }
   return closest;
 }
 
-std::pair<double, double> StopFinder::get_coords(const std::string& busstop) const{
+std::pair<double, double> StopFinder::get_coords(const std::string &busstop) const {
   if (auto it = coordinates_.find(busstop); it != coordinates_.end()) {
     return it->second;
   }

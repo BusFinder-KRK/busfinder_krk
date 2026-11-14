@@ -13,6 +13,8 @@ public:
 
 private:
   crow::SimpleApp app_;
+
+public:
   /// utilities
   static crow::json::wvalue make_default_response(const RouteData &);
   static crow::json::wvalue make_stop_list();

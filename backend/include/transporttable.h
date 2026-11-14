@@ -52,25 +52,21 @@ struct Trip {
 class TransportTable {
 public:
   std::unordered_map<std::pair<std::string, std::string>, std::vector<Trip>,
-                   PairHash>
-    table_;
+    PairHash>
+  table_;
 
   TransportTable(std::string q = default_query,
                  const std::chrono::time_point<std::chrono::system_clock> t =
                      std::chrono::system_clock::now())
-      : query_{std::move(q)}, time_{t} {};
+    : query_{std::move(q)}, time_{t} {};
   void generate_table();
+  std::pair<std::string, std::string> format_time() const;
+
 private:
   std::optional<pqxx::connection> connection_;
   std::string query_;
   std::chrono::time_point<std::chrono::system_clock> time_;
-  /**
-   * @brief Formats the time_ parameter to a string usable in the query.
-   *
-   * @return A (time, time limit) pair formatted for the query.
-   */
-  std::pair<std::string, std::string> format_time_test() const;
-  std::pair<std::string, std::string> format_time() const;
+
 public:
   //helper members;
   void printtable();

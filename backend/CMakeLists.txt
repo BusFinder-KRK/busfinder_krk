@@ -5,6 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
+# fetching dependencies
 
 FetchContent_Declare(
         asio
@@ -31,29 +32,68 @@ FetchContent_Declare(
 FetchContent_Declare(
         nanoflann
         GIT_REPOSITORY https://github.com/jlblancoc/nanoflann.git
-        GIT_TAG        v1.6.0
+        GIT_TAG v1.6.0
 )
 
 set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
+# turning off build tests for dependencies for faster compile times
+
+set(NANOFLANN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(NANOFLANN_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CROW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(CROW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_TEST OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libpqxx nanoflann crow)
 
-add_executable(backend
+# creating a static lib for backend
+
+add_library(busfinder_core_lib STATIC
         src/transporttable.cpp
-        src/main.cpp
         src/routing.cpp
         src/stopfinder.cpp
         src/translator.cpp
         src/api.cpp
 )
 
-target_include_directories(backend PRIVATE include)
+target_include_directories(busfinder_core_lib PUBLIC include)
 
-target_link_libraries(backend PRIVATE pqxx nanoflann::nanoflann Crow::Crow)
+target_link_libraries(busfinder_core_lib PUBLIC
+        pqxx
+        nanoflann::nanoflann
+        Crow::Crow
+)
+
+# setting so all of the targets that link against this lib get c++20
+
+target_compile_features(
+        busfinder_core_lib
+        PUBLIC
+        cxx_std_20
+)
+
+# creating the backend executable
+
+add_executable(backend
+        src/main.cpp
+)
+
+
+target_link_libraries(backend PRIVATE busfinder_core_lib)
 
 set_target_properties(backend PROPERTIES
-        CXX_STANDARD 20
-        CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
 )
+
+#build option for tests
+
+option(BUSFINDER_BUILD_TESTS "Build BusFinder tests" OFF)
+
+#temporarily turning the test build option on for development
+#set(BUSFINDER_BUILD_TESTS ON)
+
+if (BUSFINDER_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif ()
