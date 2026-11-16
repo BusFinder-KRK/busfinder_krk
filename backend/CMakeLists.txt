@@ -91,7 +91,7 @@ set_target_properties(backend PROPERTIES
 option(BUSFINDER_BUILD_TESTS "Build BusFinder tests" OFF)
 
 #temporarily turning the test build option on for development
-#set(BUSFINDER_BUILD_TESTS ON)
+set(BUSFINDER_BUILD_TESTS ON)
 
 if (BUSFINDER_BUILD_TESTS)
     enable_testing()

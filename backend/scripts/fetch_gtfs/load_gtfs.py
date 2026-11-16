@@ -11,6 +11,7 @@ url_tram = "https://gtfs.ztp.krakow.pl/GTFS_KRK_T.zip"
 
 bus_filename = "GTFS_BUS.zip"
 tram_filename = "GTFS_TRAM.zip"
+
 start_time: datetime = datetime.now(tz=timezone.utc).astimezone()
 print(f"[{start_time.strftime("%X %x")}] Starting GTFS import...")
 with r.get(url_bus, stream=True) as response:

@@ -32,6 +32,7 @@ api::api() {
 
   CROW_ROUTE(app_, "/route/route_coords")
   ([](const crow::request &req) {
+    //TODO finish this for coordinate-based routing (WIP)
     char *coords1_lat = req.url_params.get("coords1_lat");
     char *coords1_lon = req.url_params.get("coords1_lon");
     char *coords2_lat = req.url_params.get("coords2_lat");
