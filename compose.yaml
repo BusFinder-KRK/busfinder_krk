@@ -17,7 +17,7 @@ services:
     build: ./backend
     environment:
       host: db
-      port: ${port}
+      dbport: ${dbport}
       dbname: ${dbname}
       user: ${user}
       password: ${password}

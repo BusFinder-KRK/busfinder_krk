@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
 COPY CMakeLists.txt .
 COPY include ./include
 COPY src ./src
+COpy tests ./tests
 
 RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
     && cmake --build build -j$(nproc)
