@@ -38,7 +38,7 @@ public:
     }
   };
 
-  int number_of_stops;
+  int number_of_stops{};
   std::optional<pqxx::connection> connection_;
 
   std::unordered_map<std::string, std::pair<double, double> >
@@ -49,10 +49,12 @@ public:
     size_t>
   wrapper_tree_;
 
-  StopFinder(const int &num);
+  explicit StopFinder(const int &num);
   void generate_map();
   std::pair<double, double> get_coords(const std::string &busstop) const;
 
   std::vector<std::pair<std::string, double> >
   find_stop_ids(const std::string &stopid);
+  //For testing
+  StopFinder(const std::unordered_map<std::string, std::pair<double, double> > &stops, const int &num);
 };

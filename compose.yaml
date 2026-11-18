@@ -21,6 +21,7 @@ services:
       dbname: ${dbname}
       user: ${user}
       password: ${password}
+      walking_csv_path: ${walking_csv_path}
       TZ: Europe/Warsaw
     depends_on:
       db:

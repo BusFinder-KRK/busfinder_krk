@@ -43,22 +43,28 @@ struct PairHash {
   }
 };
 
-struct Trip {
-  std::string time_stop1;
-  std::string time_stop2;
-  std::string trip_id;
-};
 
 class TransportTable {
+  using stopPair = std::pair<std::string, std::string>;
+
 public:
-  std::unordered_map<std::pair<std::string, std::string>, std::vector<Trip>,
+  struct Trip {
+    std::string time_stop1;
+    std::string time_stop2;
+    std::string trip_id;
+  };
+
+  std::unordered_map<stopPair, std::vector<Trip>,
     PairHash>
   table_;
 
-  TransportTable(std::string q = default_query,
-                 const std::chrono::time_point<std::chrono::system_clock> t =
-                     std::chrono::system_clock::now())
+  explicit TransportTable(std::string q = default_query,
+                          const std::chrono::time_point<std::chrono::system_clock> t =
+                              std::chrono::system_clock::now())
     : query_{std::move(q)}, time_{t} {};
+  TransportTable(TransportTable &&other) noexcept : table_{std::move(other.table_)} {}
+
+
   void generate_table();
   std::pair<std::string, std::string> format_time() const;
 
@@ -71,6 +77,15 @@ public:
   //helper members;
   void printtable();
   size_t size() const { return table_.size(); }
+
+  /**
+  * Strictly for testing.
+  * @param table the constructed table to use
+  * @param time starting time
+  */
+  explicit TransportTable(std::unordered_map<stopPair, std::vector<Trip>, PairHash> table,
+                          std::chrono::time_point<std::chrono::system_clock> time) : time_{time},
+    table_{std::move(table)} {}
 };
 
 #endif // SRC_TRANSPORTTABLE_H

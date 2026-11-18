@@ -16,8 +16,8 @@ inline std::string test_query2 = R"(
 class Translator {
 public:
     std::unordered_map<std::string, std::string> stop_name_;
-    std::string get_human_line(std::string input);
-    std::string get_human_stop_name(std::string input);
+    std::string get_human_line(const std::string& input);
+    std::string get_human_stop_name(const std::string& input);
     Translator();
 private:
     std::optional<pqxx::connection> connection_;

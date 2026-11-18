@@ -3,22 +3,34 @@
 #include <routing.h>
 #include "crow/mustache.h"
 
-Routing::Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
+Routing::Routing(const std::chrono::zoned_time<std::chrono::seconds> time_arg,
+                 const std::filesystem::path &walking_csv_path,
                  const int search_window_arg, const double time_for_change_arg,
                  const double walking_multiplier_arg,
                  const double walking_pace_arg, const int adjacent_stops_arg)
-  : sf_{adjacent_stops}, ttable_{default_query, time_arg.get_sys_time()},
-    search_window{search_window_arg}, time_for_change{time_for_change_arg},
-    walking_multiplier{walking_multiplier_arg},
-    walking_pace{walking_pace_arg}, adjacent_stops{adjacent_stops_arg} {
+  : search_window{search_window_arg}, time_for_change{time_for_change_arg}, walking_multiplier{walking_multiplier_arg},
+    walking_pace{walking_pace_arg}, adjacent_stops{adjacent_stops_arg},
+    csv_path_{walking_csv_path},
+    ttable_{default_query, time_arg.get_sys_time()}, sf_{adjacent_stops} {
   ttable_.generate_table();
+  load_walking_csv();
+}
+
+Routing::Routing(std::filesystem::path walking_csv_path, TransportTable ttable,
+                 const StopFinder &sfinder) : search_window{30},
+                                              time_for_change{0.5},
+                                              walking_multiplier{1.01}, walking_pace{60},
+                                              adjacent_stops{40},
+                                              csv_path_{std::move(walking_csv_path)},
+                                              ttable_{std::move(ttable)},
+                                              sf_{sfinder.coordinates_, sfinder.number_of_stops} {
   load_walking_csv();
 }
 
 void Routing::load_walking_csv() {
   std::ifstream file(csv_path_);
   if (!file.is_open()) {
-    return;
+    throw std::ios_base::failure("Couldn't open the walking csv.");
   }
   std::string line;
   std::stringstream ss;
@@ -34,7 +46,7 @@ std::vector<Routing::NodeTransport> Routing::transport_between_stops(
   const std::string &stop_id1, const std::string &stop_id2,
   std::chrono::zoned_time<std::chrono::seconds> time) {
   auto local_timepoint = time.get_local_time();
-  std::vector<Routing::NodeTransport> result;
+  std::vector<NodeTransport> result;
   std::string houradmin = std::format("{:%H:%M}", local_timepoint);
   auto midnight = std::chrono::floor<std::chrono::days>(local_timepoint);
 
@@ -139,7 +151,6 @@ std::optional<Routing::NodeTransport> Routing::walking_between_stops(
   return std::nullopt;
 }
 
-// fix so its optional
 std::optional<Routing::NodeTransport> Routing::walking_between_stops_reverse(
   const std::string &stop_id1, const std::string &stop_id2,
   std::chrono::zoned_time<std::chrono::seconds> time) {
@@ -156,11 +167,11 @@ std::optional<Routing::NodeTransport> Routing::walking_between_stops_reverse(
     return nt;
   }
 
-  if (auto it = walking_times_.find(std::make_pair(stop_id2, stop_id1));
+  if (const auto it = walking_times_.find(std::make_pair(stop_id2, stop_id1));
     it != walking_times_.end()) {
-    auto walk_duration = std::chrono::ceil<std::chrono::minutes>(
+    const auto walk_duration = std::chrono::ceil<std::chrono::minutes>(
       std::chrono::duration<double, std::ratio<60> >(it->second));
-    std::chrono::zoned_time<std::chrono::seconds> t1{
+    const std::chrono::zoned_time t1{
       time.get_time_zone(), local_timepoint - walk_duration
     };
     NodeTransport nt{"walk", t1, time};
@@ -171,7 +182,7 @@ std::optional<Routing::NodeTransport> Routing::walking_between_stops_reverse(
 
 std::vector<std::pair<Routing::Node,
   std::pair<Routing::NodeTimeInfo, Routing::NodeTransport> > >
-Routing::dijkstra_dalekowzrocznosc(
+Routing::dijkstra_farsighted(
   const std::string &start, const std::string &target,
   std::chrono::zoned_time<std::chrono::seconds> time) {
   Node start_node{start, "start"};
@@ -306,7 +317,7 @@ Routing::dijkstra_dalekowzrocznosc(
 
 std::vector<std::pair<Routing::Node,
   std::pair<Routing::NodeTimeInfo, Routing::NodeTransport> > >
-Routing::dijkstra_new_reversed(
+Routing::dijkstra_reversed(
   const std::string &start, const std::string &target,
   std::chrono::zoned_time<std::chrono::seconds> time) {
   Node start_node{start, "end"};
@@ -437,12 +448,12 @@ Routing::dijkstra_new_reversed(
   return ans;
 }
 
-RouteData Routing::output(const std::string &start, const std::string &target,
-                          std::chrono::zoned_time<std::chrono::seconds> time) {
-  auto vec = dijkstra_dalekowzrocznosc(start, target, time);
+RouteData Routing::find_route(const std::string &start, const std::string &target,
+                              std::chrono::zoned_time<std::chrono::seconds> time) {
+  auto vec = dijkstra_farsighted(start, target, time);
   if (vec.empty()) throw std::invalid_argument("Target unreachable.");
   auto arrival_time = vec[vec.size() - 1].second.first.real_time;
-  auto vec_rev = dijkstra_new_reversed(target, start, arrival_time);
+  auto vec_rev = dijkstra_reversed(target, start, arrival_time);
   RouteData endgame;
   std::vector<RouteData::RouteDataNode> endgame_vec;
   int i = 1;

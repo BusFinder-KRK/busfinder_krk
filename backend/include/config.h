@@ -3,11 +3,13 @@
 #ifndef BUSFINDER_BACKEND_DOTENV_PARSE_H
 #define BUSFINDER_BACKEND_DOTENV_PARSE_H
 
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <string>
 
 inline void dotenv_parse() {
+  std::filesystem::current_path(PROJECT_ROOT_DIR);
   std::ifstream file(".env");
   if (!file.is_open()) throw std::ios_base::failure("error: can't open .env");
   std::string line;
@@ -21,8 +23,8 @@ inline void dotenv_parse() {
   }
 }
 
-inline std::string load_var(const char* key) {
-  const char* val = std::getenv(key);
+inline std::string load_var(const char *key) {
+  const char *val = std::getenv(key);
   if (!val || std::string(val).empty())
     throw std::runtime_error(std::string("Missing environment variable: ") + key);
   return val;
@@ -35,6 +37,8 @@ struct Config {
   inline static std::string db_user;
   inline static std::string db_password;
   inline static std::string connection_string;
+  inline static std::filesystem::path walking_csv_path;
+
   static void load() {
     dotenv_parse();
     db_host = load_var("host");
@@ -42,7 +46,9 @@ struct Config {
     db_name = load_var("dbname");
     db_user = load_var("user");
     db_password = load_var("password");
-    connection_string = std::format("host={} port={} dbname={} user={} password={}", db_host, db_port, db_name, db_user, db_password);
+    connection_string = std::format("host={} port={} dbname={} user={} password={}", db_host, db_port, db_name, db_user,
+                                    db_password);
+    walking_csv_path = load_var("walking_csv_path");
   }
 };
 #endif // BUSFINDER_BACKEND_DOTENV_PARSE_H

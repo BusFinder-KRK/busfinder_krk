@@ -5,6 +5,8 @@
 #include <routing.h>
 #include <translator.h>
 
+#include "config.h"
+
 api::api() {
   CROW_ROUTE(app_, "/route/route_stops")
   ([](const crow::request &req) {
@@ -22,7 +24,7 @@ api::api() {
 
     auto parsed_time = parse_time(datetime);
     Routing r = make_routing(parsed_time, req);
-    const RouteData route = r.output(stopid1, stopid2, parsed_time);
+    const RouteData route = r.find_route(stopid1, stopid2, parsed_time);
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::system_clock::now() - start);
     std::cout << "search duration: " << duration.count() / 1000 << "s "
@@ -63,8 +65,6 @@ api::api() {
 Routing
 api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
                   const crow::request &req) {
-  char *walking_test = req.url_params.get("walking_pace");
-
   const int search_window =
       std::stoi(req.url_params.get("search_window") != nullptr
                   ? req.url_params.get("search_window")
@@ -82,7 +82,7 @@ api::make_routing(std::chrono::zoned_time<std::chrono::seconds> parsed_time,
                   ? req.url_params.get("adjacent_stops")
                   : "40");
 
-  return Routing(parsed_time, search_window, time_for_change,
+  return Routing(parsed_time, Config::walking_csv_path, search_window, time_for_change,
                  walking_multiplier, 60, adjacent_stops);
 }
 

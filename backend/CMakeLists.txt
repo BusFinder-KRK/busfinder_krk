@@ -85,7 +85,8 @@ target_link_libraries(backend PRIVATE busfinder_core_lib)
 set_target_properties(backend PROPERTIES
         CXX_EXTENSIONS OFF
 )
-
+#setting the project working directory
+target_compile_definitions(busfinder_core_lib PUBLIC PROJECT_ROOT_DIR=\"${CMAKE_SOURCE_DIR}\")
 #build option for tests
 
 option(BUSFINDER_BUILD_TESTS "Build BusFinder tests" OFF)
@@ -97,3 +98,4 @@ if (BUSFINDER_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif ()
+

@@ -90,3 +90,13 @@ std::pair<double, double> StopFinder::get_coords(const std::string &busstop) con
   }
   return {0.0, 0.0};
 }
+
+StopFinder::StopFinder(const std::unordered_map<std::string, std::pair<double, double> > &stops,
+                       const int &num) : number_of_stops{num + 1}, wrapper_tree_{2, ks} {
+  for (auto &[stopid, loc]: stops) {
+    StopData sd{stopid, loc.first, loc.second};
+    ks.tree_vec_.push_back(sd);
+    coordinates_[stopid] = {sd.x, sd.y};
+  }
+  wrapper_tree_.buildIndex();
+}

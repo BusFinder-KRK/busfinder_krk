@@ -32,9 +32,9 @@ void Translator::generate_lines() {
     transaction.commit();
 }
 
-std::string Translator::get_human_line(std::string input) {
+std::string Translator::get_human_line(const std::string& input) {
     return line_[input];
 }
-std::string Translator::get_human_stop_name(std::string input) {
+std::string Translator::get_human_stop_name(const std::string& input) {
     return stop_name_[input];
 }

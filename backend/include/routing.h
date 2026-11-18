@@ -13,6 +13,7 @@
 
 class Routing {
 public:
+  // Searching parameters
   const int search_window;
   const double time_for_change;
   const double walking_multiplier;
@@ -45,16 +46,20 @@ public:
     std::chrono::zoned_time<std::chrono::seconds> arrival;
   };
 
+  /**
+   * For API usage
+   */
   explicit Routing(std::chrono::zoned_time<std::chrono::seconds> time_arg,
+                   const std::filesystem::path &walking_csv_path,
                    int search_window_arg, double time_for_change_arg,
                    double walking_multiplier_arg, double walking_pace_arg,
                    int adjacent_stops_arg);
 
-  RouteData output(const std::string &start, const std::string &target,
-                   std::chrono::zoned_time<std::chrono::seconds> time);
+  RouteData find_route(const std::string &start, const std::string &target,
+                       std::chrono::zoned_time<std::chrono::seconds> time);
 
 private:
-  std::filesystem::path csv_path_ = "scripts/walking_times/walking_times.csv";
+  std::filesystem::path csv_path_;
   std::unordered_map<std::pair<std::string, std::string>, double, PairHash>
   walking_times_;
   TransportTable ttable_;
@@ -80,12 +85,18 @@ private:
     std::chrono::zoned_time<std::chrono::seconds> time);
 
   std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport> > >
-  dijkstra_dalekowzrocznosc(const std::string &start, const std::string &target,
-                            std::chrono::zoned_time<std::chrono::seconds> time);
+  dijkstra_farsighted(const std::string &start, const std::string &target,
+                      std::chrono::zoned_time<std::chrono::seconds> time);
 
   std::vector<std::pair<Node, std::pair<NodeTimeInfo, NodeTransport> > >
-  dijkstra_new_reversed(const std::string &start, const std::string &target,
-                        std::chrono::zoned_time<std::chrono::seconds> time);
+  dijkstra_reversed(const std::string &start, const std::string &target,
+                    std::chrono::zoned_time<std::chrono::seconds> time);
+
+public:
+  /**
+   * For testing; doesn't set searching parameters
+   */
+  explicit Routing(std::filesystem::path walking_csv_path, TransportTable ttable, const StopFinder &sfinder);
 };
 
 #endif // BUSFINDER_BACKEND_ROUTING_H
